@@ -251,6 +251,17 @@ button { font-family: inherit; cursor: pointer; }
 
 .deck-line { text-align: center; color: var(--text-muted); font-size: 12px; margin: 14px 0 0; }
 
+/* 备份过期提醒：贴在首页底部，点一下进设置 */
+.nudge {
+  align-self: center;
+  margin: 10px 0 0;
+  color: var(--warn-ink);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.warn-text { color: var(--bad-ink); font-weight: 600; }
+
 /* 首页：内容顶对齐，剩余留白放在底部（把统计压到底反而中间挖个洞） */
 .page.home { display: flex; flex-direction: column; }
 

@@ -15,7 +15,7 @@ import { reviewView } from './views/review.js';
 import { mistakesView } from './views/mistakes.js';
 import { statsView } from './views/stats.js';
 import { settingsView } from './views/settings.js';
-import { loadPrefs, savePrefs } from './prefs.js';
+import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from './prefs.js';
 import { createSound } from './sound.js';
 import { esc } from './dom.js';
 
@@ -57,6 +57,7 @@ const app = {
   ctx: null,
   prefs: loadPrefs(),
   sound: createSound({ enabled: loadPrefs().sound }),
+  persistState: null,
 };
 
 // 评分有一次 260ms 的收尾动画，期间禁止重复评分
@@ -93,6 +94,7 @@ function context() {
   const { current, best } = computeStreak(app.state.daily, today);
   const cardList = Object.values(app.state.cards);
   const learned = cardList.filter((c) => c.state !== 'new').length;
+  const backupDays = backupAgeDays(app.prefs);
   const newLeftInDeck = deck
     ? deck.words.reduce((n, w) => n + (!app.state.cards[w.id] || app.state.cards[w.id].state === 'new' ? 1 : 0), 0)
     : 0;
@@ -110,6 +112,10 @@ function context() {
     newLeftInDeck,
     wordMap: app.wordMap,
     reviewTotal: app.reviewTotal,
+    // 备份提醒：从没导出过就看学了多少词，导出过就看隔了多久
+    backupDays: backupDays ?? 0,
+    backupNever: backupDays === null,
+    backupOverdue: backupOverdue(app.prefs, learned),
     state: app.state,
   };
 }
@@ -378,6 +384,10 @@ root.addEventListener('click', async (e) => {
       resetProgress();
       break;
     }
+    case 'force-reload': {
+      forceReload();
+      break;
+    }
     case 'toggle-sound': {
       app.prefs.sound = !app.prefs.sound;
       savePrefs(app.prefs);
@@ -394,6 +404,13 @@ root.addEventListener('click', async (e) => {
 
 // ---------- 备份 / 恢复 / 重置 ----------
 
+/** 记录「刚备份过」，让设置页和首页的提醒归零 */
+function markExported() {
+  app.prefs.lastExportAt = Date.now();
+  savePrefs(app.prefs);
+  render();
+}
+
 function exportFile() {
   const text = app.storage.exportJSON();
   try {
@@ -406,6 +423,7 @@ function exportFile() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
+    markExported();
     showToast(`已导出（${(text.length / 1024).toFixed(0)}KB）`);
   } catch (err) {
     console.warn(err);
@@ -417,6 +435,7 @@ async function copyExport() {
   const text = app.storage.exportJSON();
   try {
     await navigator.clipboard.writeText(text);
+    markExported();
     showToast(`已复制（${(text.length / 1024).toFixed(0)}KB）`);
   } catch {
     // iOS 非 https 环境下剪贴板不可用
@@ -455,6 +474,42 @@ function resetProgress() {
   app.screen = 'home';
   render();
   showToast('进度已清空');
+}
+
+/**
+ * 逃生口：注销 Service Worker、清掉离线缓存、重新加载。
+ * 只清缓存，不碰 localStorage —— 学习数据不会丢。
+ */
+async function forceReload() {
+  const ok = typeof confirm === 'function'
+    ? confirm('会清掉离线缓存并重新下载脚本，学习数据不受影响。继续？')
+    : true;
+  if (!ok) return;
+
+  try {
+    const regs = (await navigator.serviceWorker?.getRegistrations?.()) || [];
+    await Promise.all(regs.map((r) => r.unregister()));
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => caches.delete(k)));
+  } catch (err) {
+    console.warn('[SW] 清理失败', err);
+  }
+  location.reload();
+}
+
+/** 申请持久化存储：降低「空间紧张时被系统回收」的概率。不支持就静默跳过。 */
+async function requestPersistence() {
+  const s = globalThis.navigator?.storage;
+  if (!s || typeof s.persist !== 'function') {
+    app.persistState = 'unsupported';
+    return;
+  }
+  try {
+    const already = typeof s.persisted === 'function' ? await s.persisted() : false;
+    app.persistState = already ? 'granted' : ((await s.persist()) ? 'granted' : 'default');
+  } catch {
+    app.persistState = 'unknown';
+  }
 }
 
 document.addEventListener('keydown', (e) => {
@@ -556,3 +611,4 @@ boot().catch((e) => {
 });
 
 registerServiceWorker();
+requestPersistence();

@@ -141,11 +141,20 @@ console.log('界面冒烟测试');
     const s = statsView(ctx);
     if (!s.includes('近 7 天') || !s.includes('词库进度') || !s.includes('42')) fail('统计页内容不对');
     const cfg = settingsView(
-      { state, deckMetas: [{ id: 'ielts-core', name: '雅思词汇真经', count: 3632 }], prefs: { sound: true, theme: 'auto' } },
+      {
+        state,
+        deckMetas: [{ id: 'ielts-core', name: '雅思词汇真经', count: 3632 }],
+        prefs: { sound: true, theme: 'auto', lastExportAt: Date.now() - 86400000 * 21 },
+        persistState: 'granted',
+      },
       ctx,
     );
     if (!cfg.includes('导出备份文件') || !cfg.includes('导入并覆盖') || !cfg.includes('清空进度')) fail('设置页内容不对');
     if (!cfg.includes('提示音')) fail('设置页缺少提示音开关');
+    if (!cfg.includes('数据与备份') || !cfg.includes('上次备份') || !cfg.includes('强制刷新')) fail('设置页缺少备份状态/逃生口');
+    if (!cfg.includes('21 天前')) fail('设置页没有正确显示备份天数');
+    if (!cfg.includes('主屏 App') && !cfg.includes('Safari 标签页')) fail('设置页没有显示运行环境');
+    if (!cfg.includes('已授予')) fail('设置页没有显示持久化存储状态');
     if (!cfg.includes('快捷指令')) fail('设置页缺少「怎么被叫来」的说明');
     // 鲸鱼娘只能出现在完成页/空状态，且署名不许进界面
     if (cfg.includes('上善无形') || cfg.includes('CC BY-NC')) fail('设置页里出现了署名，应该只在 README');
@@ -157,6 +166,12 @@ console.log('界面冒烟测试');
     const doneMet = doneView({ lastSession: { mode: 'learn' }, state }, metCtx);
     if (!doneMet.includes('今天学完了')) fail('完成页达标标题不对');
     if (!doneMet.includes('鲸鱼娘开始认得你了')) fail('连续 8 天的文案分档不对');
+    // 首页的备份提醒
+    const { homeView } = await import('../src/ui/views/home.js');
+    const homeNudge = homeView({ ...ctx, backupOverdue: true, backupNever: false, backupDays: 21 });
+    if (!homeNudge.includes('备份已 21 天没做')) fail('首页没有显示备份过期提醒');
+    const homeClean = homeView({ ...ctx, backupOverdue: false, backupNever: true, backupDays: 0 });
+    if (homeClean.includes('备份已')) fail('不该提醒的时候提醒了');
     if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 都能渲染，文案分档正确，界面无署名');
   } catch (e) {
     fail(`Stage 3 页面渲染报错：${e.message}`);

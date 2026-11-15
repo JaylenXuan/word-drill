@@ -15,7 +15,7 @@ import {
 } from '../src/core/storage.js';
 import { applyGrade } from '../src/core/review.js';
 import { createSound } from '../src/ui/sound.js';
-import { loadPrefs, savePrefs } from '../src/ui/prefs.js';
+import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from '../src/ui/prefs.js';
 import { buildSession, currentItem, gradeSession, isFinished, remaining, sessionSummary, MAX_RECYCLE } from '../src/core/session.js';
 import { simulateDays } from '../src/core/simulate.js';
 
@@ -591,6 +591,25 @@ test('偏好存在独立 key，不污染业务状态', () => {
   assert.deepEqual([...mem.keys()], ['vocab.ui']);
   assert.equal(loadPrefs().sound, false);
   delete globalThis.localStorage;
+});
+test('备份天数：从没导出过返回 null', () => {
+  assert.equal(backupAgeDays({}), null);
+  assert.equal(backupAgeDays({ lastExportAt: 0 }), null);
+});
+test('备份天数按自然日计算', () => {
+  const now = Date.UTC(2026, 10, 15, 12);
+  assert.equal(backupAgeDays({ lastExportAt: now - 86400000 * 3 }, now), 3);
+  assert.equal(backupAgeDays({ lastExportAt: now - 3600_000 }, now), 0);
+  assert.equal(backupAgeDays({ lastExportAt: now }, now), 0);
+});
+test('备份提醒：14 天是线，没备份过则看学了几个词', () => {
+  const now = Date.UTC(2026, 10, 15, 12);
+  const day = 86400000;
+  assert.equal(backupOverdue({ lastExportAt: now - day * 13 }, 500, now), false);
+  assert.equal(backupOverdue({ lastExportAt: now - day * 14 }, 500, now), true);
+  // 从没导出过：学了 19 个词不吵，20 个才开始提醒
+  assert.equal(backupOverdue({}, 19, now), false);
+  assert.equal(backupOverdue({}, 20, now), true);
 });
 
 // ---------- 配色对比度 ----------

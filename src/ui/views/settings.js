@@ -1,10 +1,31 @@
 ﻿// 设置页：每日新词数 / 切换词库 / 备份与恢复 / 重置 / 关于
 import { esc } from '../dom.js';
+import { backupAgeDays, backupOverdue } from '../prefs.js';
 
 export function settingsView(app, ctx) {
   const cfg = app.state.config;
   const target = cfg.dailyNewTarget;
   const eta = ctx.total ? Math.ceil((ctx.newLeftInDeck || 0) / Math.max(1, target)) : 0;
+
+  // 当前是主屏 App 还是 Safari 标签页（两套 localStorage，跑错容器就会「数据变空」）
+  const standalone = !!(
+    globalThis.matchMedia?.('(display-mode: standalone)')?.matches ||
+    globalThis.navigator?.standalone === true
+  );
+
+  // 备份状态
+  const ageDays = backupAgeDays(app.prefs);
+  const overdue = backupOverdue(app.prefs, ctx.learned);
+  const backupText = ageDays === null
+    ? '从未导出'
+    : ageDays === 0 ? '今天' : `${ageDays} 天前`;
+
+  const persistText = {
+    granted: '已授予（不容易被系统回收）',
+    default: '未授予（空间紧张时可能被清）',
+    unsupported: '浏览器不支持',
+    unknown: '未知',
+  }[app.persistState] || '检查中…';
 
   return `
   <div class="page">
@@ -49,8 +70,11 @@ export function settingsView(app, ctx) {
     </section>
 
     <section class="card">
-      <h2>备份</h2>
-      <p class="muted small">数据只存在这台设备的浏览器里。换手机、清缓存前请先导出。</p>
+      <h2>数据与备份</h2>
+      <div class="kv"><span>当前环境</span><span>${standalone ? '主屏 App（数据独立于 Safari）' : 'Safari 标签页'}</span></div>
+      <div class="kv"><span>上次备份</span><span class="${overdue ? 'warn-text' : ''}">${backupText}</span></div>
+      <div class="kv"><span>持久化存储</span><span>${persistText}</span></div>
+      <p class="muted small">数据只存在这台设备的浏览器里。换手机、清缓存、删主屏图标之前请先导出。</p>
       <div class="actions">
         <button class="primary" data-action="export-download">导出备份文件</button>
         <button class="link" data-action="export-copy">复制到剪贴板</button>
@@ -83,14 +107,16 @@ export function settingsView(app, ctx) {
 
     <section class="card">
       <h2>关于</h2>
-      <div class="kv"><span>版本</span><span>0.7.0</span></div>
+      <div class="kv"><span>版本</span><span>0.8.0</span></div>
       <div class="kv"><span>词库</span><span>雅思词汇真经 ${ctx.total} 词</span></div>
       <div class="kv"><span>来源</span><span>github.com/hefengxian/my-ielts</span></div>
       <div class="kv"><span>协议</span><span>原仓库未声明 LICENSE，仅个人学习用</span></div>
       <div class="kv"><span>算法</span><span>简化 SM-2（三键评分）</span></div>
       <p class="muted small">认识：间隔 × 难度因子；模糊：至少 +1 天；不认识：回到 1 天并在本场再看一次。</p>
+      <button class="link" data-action="force-reload">页面出问题？强制刷新（清离线缓存）</button>
     </section>
   </div>`;
 }
+
 
 

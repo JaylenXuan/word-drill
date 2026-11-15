@@ -57,6 +57,9 @@ export function homeView(ctx) {
   </section>
 
   <p class="deck-line">词库：${esc(ctx.deck?.name || '未选择')}</p>
+  ${ctx.backupOverdue ? `<button class="link nudge" data-action="tab" data-tab="settings">
+    ${ctx.backupNever ? `还没导出过备份` : `备份已 ${ctx.backupDays} 天没做`} · 去设置里导出
+  </button>` : ''}
   </div>
   `;
 }
