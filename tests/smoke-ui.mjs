@@ -1,4 +1,4 @@
-// 界面冒烟测试：node tests/smoke-ui.mjs
+﻿// 界面冒烟测试：node tests/smoke-ui.mjs
 // 用极简 DOM 桩把 src/ui/app.js 真正跑起来，专抓「白屏」类错误：
 // 导入不存在的函数、运行时拼错变量、词库路径写错、渲染 undefined。
 // 两个场景：首次打开（引导页）、已有进度（首页）。1 秒内出结果。
@@ -172,6 +172,15 @@ console.log('界面冒烟测试');
     if (!homeNudge.includes('备份已 21 天没做')) fail('首页没有显示备份过期提醒');
     const homeClean = homeView({ ...ctx, backupOverdue: false, backupNever: true, backupDays: 0 });
     if (homeClean.includes('备份已')) fail('不该提醒的时候提醒了');
+    // 补考阶段的卡片要标出「补考」，不能还写「新词」
+    const { sessionView } = await import('../src/ui/views/session.js');
+    const { buildSession } = await import('../src/core/session.js');
+    const s2 = buildSession('learn', ['ielts0001', 'ielts0002']);
+    s2.mainIndex = 2; // 主队列走完
+    s2.retry.push({ id: 'ielts0001', tries: 1 });
+    const sv = sessionView({ session: s2, wordMap, flipped: false, lastGap: null });
+    if (!sv.includes('补考')) fail('补考阶段的卡片没标「补考」');
+    if (!sv.includes('补考 1/3')) fail('补考计数没显示');
     if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 都能渲染，文案分档正确，界面无署名');
   } catch (e) {
     fail(`Stage 3 页面渲染报错：${e.message}`);
@@ -183,3 +192,4 @@ else {
   console.log(`\n冒烟失败 ${failed} 项`);
   process.exitCode = 1;
 }
+

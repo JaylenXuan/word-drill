@@ -1,15 +1,21 @@
 // 卡片会话：全屏、无 tab 干扰，点卡片翻面，三键评分
 import { esc } from '../dom.js';
-import { currentItem, remaining } from '../../core/session.js';
+import { currentItem, progress, MAX_RETRY } from '../../core/session.js';
+
+const CHIP = { learn: '新词', review: '复习', extra: '加练' };
 
 export function sessionView(app) {
   const item = currentItem(app.session);
   if (!item) return '<div class="page"><p class="muted">队列空了</p></div>';
   const w = app.wordMap.get(item.id) || { word: item.id, meaning: '（词条缺失）' };
-  const total = app.session.queue.length;
-  const done = Math.min(app.session.index, total);
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  const isLearn = app.session.mode === 'learn';
+  const p = progress(app.session);
+  // 主队列的进度按「已评分的不同词」算，补考单独显示，不会让进度条倒退
+  const pct = p.mainTotal ? Math.round((p.mainDone / p.mainTotal) * 100) : 0;
+  const inRetry = p.phase === 'retry';
+  const chip = inRetry ? '补考' : (CHIP[app.session.mode] || '复习');
+  const counter = inRetry
+    ? `补考 ${Math.min(item.tries, MAX_RETRY)}/${MAX_RETRY}`
+    : `${p.mainDone}/${p.mainTotal}`;
   // 长词/多拼写要缩字号，否则会撑破卡片
   const sizeClass = w.word.length > 16 ? 'xlong' : w.word.length > 11 ? 'long' : '';
 
@@ -18,18 +24,18 @@ export function sessionView(app) {
     <header class="session-bar">
       <button class="icon-btn" data-action="exit-session" aria-label="退出">✕</button>
       <div class="session-progress"><i style="width:${pct}%"></i></div>
-      <div class="session-count">${remaining(app.session)}</div>
+      <div class="session-count ${inRetry ? 'is-retry' : ''}">${counter}</div>
     </header>
 
     <div class="flip ${app.flipped ? 'is-flipped' : ''}" data-action="flip">
       <div class="flip-inner">
         <div class="face front">
-          <span class="mode-chip">${isLearn ? '新词' : '复习'}</span>
+          <span class="mode-chip ${inRetry ? 'is-retry' : ''}">${chip}</span>
           <div class="face-inner">
             <div class="word ${sizeClass}">${esc(w.word)}</div>
             ${w.phonetic ? `<div class="phonetic">${esc(w.phonetic)}</div>` : ''}
             <button class="speak" data-action="speak" aria-label="发音">🔊</button>
-            <div class="tip">轻点卡片看释义</div>
+            <div class="tip">${inRetry ? '再看一眼，这次记住了吗' : '轻点卡片看释义'}</div>
           </div>
         </div>
         <div class="face back">
@@ -40,7 +46,7 @@ export function sessionView(app) {
             ${w.note ? `<div class="note">${esc(w.note)}</div>` : ''}
             ${w.example ? `<div class="example">${esc(w.example)}</div>` : ''}
             ${w.exampleZh ? `<div class="example-zh">${esc(w.exampleZh)}</div>` : ''}
-            <div class="tip">记住了吗？</div>
+            <div class="tip">${inRetry ? `第 ${item.tries} 次补考` : '记住了吗？'}</div>
           </div>
         </div>
       </div>

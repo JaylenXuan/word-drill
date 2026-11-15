@@ -98,6 +98,17 @@ function context() {
   const newLeftInDeck = deck
     ? deck.words.reduce((n, w) => n + (!app.state.cards[w.id] || app.state.cards[w.id].state === 'new' ? 1 : 0), 0)
     : 0;
+  // 目标封顶：词库只剩 3 个时，今天的目标就是 3，学完照样算达标
+  const goalNew = Math.max(1, Math.min(cfg.dailyNewTarget, newLeftInDeck));
+  // 「今天加练」：今天评过「不认识」的词，可选加练，不进新词名额
+  const extraIds = deck
+    ? deck.words
+      .filter((w) => {
+        const c = app.state.cards[w.id];
+        return c && c.lastGrade === 'again' && String(c.lastReviewedAt || '').slice(0, 10) === today;
+      })
+      .map((w) => w.id)
+    : [];
   return {
     today,
     deck,
@@ -110,6 +121,8 @@ function context() {
     total: deck ? deck.words.length : 0,
     learned,
     newLeftInDeck,
+    goalNew,
+    extraIds,
     wordMap: app.wordMap,
     reviewTotal: app.reviewTotal,
     // 备份提醒：从没导出过就看学了多少词，导出过就看隔了多久
@@ -176,10 +189,16 @@ function setGradesEnabled(on) {
 
 function startSession(mode, limit = 0) {
   const ctx = app.ctx || context();
-  let ids = mode === 'learn' ? ctx.newIds : ctx.due;
+  const source = mode === 'learn' ? ctx.newIds : mode === 'extra' ? ctx.extraIds : ctx.due;
+  let ids = source;
   if (limit > 0) ids = ids.slice(0, limit);
   if (!ids.length) {
-    showToast(mode === 'learn' ? '今天的新词已经学完了' : '没有到期的复习');
+    const msg = {
+      learn: '今天的新词已经学完了',
+      review: '没有到期的复习',
+      extra: '今天没有需要加练的词',
+    }[mode] || '没有可学的词';
+    showToast(msg);
     return;
   }
   app.session = buildSession(mode, ids);
@@ -203,7 +222,9 @@ function onGrade(grade) {
   grading = true;
 
   // 1) 改卡片 + 记当日计数（纯逻辑在 core/review.js）
-  const res = applyGrade(app.state, grade, item.id, todayKey());
+  //    goalNew 传「封顶后的目标」：词库只剩几个时，今天的目标就是那几个
+  const ctxNow = app.ctx || context();
+  const res = applyGrade(app.state, grade, item.id, todayKey(), new Date(), { goalNew: ctxNow.goalNew });
   app.pendingLogs.push(res.log);
   app.lastGap = res.card.interval;
   // 2) 立刻落盘：只存学过的卡，所以这里写的 JSON 很小（几 KB ~ 几十 KB）
@@ -294,6 +315,9 @@ root.addEventListener('click', async (e) => {
       break;
     case 'start-review-light':
       startSession('review', 20);
+      break;
+    case 'start-extra':
+      startSession('extra', 10);
       break;
     case 'exit-session':
       flushLogs();

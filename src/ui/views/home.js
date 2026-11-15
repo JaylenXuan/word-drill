@@ -2,7 +2,8 @@
 import { esc, fmtDate } from '../dom.js';
 
 export function homeView(ctx) {
-  const goal = ctx.entry.goalNew || ctx.state.config.dailyNewTarget;
+  // 目标用「封顶后」的值：词库只剩 3 个时，今天的目标就是 3
+  const goal = ctx.entry.goalNew || ctx.goalNew || ctx.state.config.dailyNewTarget;
   const doneNew = ctx.entry.newLearned;
   const newLeft = ctx.newIds.length;
   const due = ctx.due.length;
@@ -18,6 +19,11 @@ export function homeView(ctx) {
   // 复习量过大时给一个「只清一部分」的出口，避免因为欠 74 张而干脆不打开
   const lightLink = due > 25
     ? `<button class="link" data-action="start-review-light">先清 20 张（最低可行日）</button>`
+    : '';
+
+  // 今天评过「不认识」的词：可选加练，不占新词名额，也不影响打卡
+  const extraLink = (ctx.extraIds?.length || 0) > 0
+    ? `<button class="link" data-action="start-extra">今天加练 ${Math.min(10, ctx.extraIds.length)} 个 · 不算进新词</button>`
     : '';
 
   return `
@@ -48,6 +54,7 @@ export function homeView(ctx) {
   <div class="actions">
     ${cta}
     ${lightLink}
+    ${extraLink}
   </div>
 
   <section class="meta">

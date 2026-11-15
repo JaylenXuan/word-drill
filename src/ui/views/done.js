@@ -2,8 +2,9 @@
 const MASCOT = 'assets/whale/whale-girl-transparent.png';
 
 /** 按「这次干了什么 + 连续多少天」挑一句话，不超过 16 字 */
-function pickLine({ isLearn, met, streak, newLearned, goal }) {
-  if (!isLearn) {
+function pickLine({ mode, met, streak, newLearned, goal }) {
+  if (mode === 'extra') return '加练过一遍，明天按调度再来。';
+  if (mode === 'review') {
     return streak >= 3 ? `第 ${streak} 天。债清了。` : '债还完了，新词明天补也不迟。';
   }
   if (!met) return `今天 ${newLearned}/${goal}，也够了。`;
@@ -13,16 +14,31 @@ function pickLine({ isLearn, met, streak, newLearned, goal }) {
   return `今天 ${newLearned} 个，收工。`;
 }
 
+/** 补考小结：做了几次、有几个认不下来交给明天 */
+function retryNote(session) {
+  if (!session) return '';
+  const total = session.retry?.length || 0;
+  const exhausted = session.exhausted || 0;
+  if (!total && !exhausted) return '';
+  const parts = [];
+  if (total) parts.push(`补考 ${total} 次`);
+  if (exhausted) parts.push(`${exhausted} 个还没过，明天按调度再来`);
+  return `<p class="muted small retry-note">${parts.join(' · ')}</p>`;
+}
+
 export function doneView(app, ctx) {
-  const isLearn = app.lastSession?.mode === 'learn';
-  const goal = ctx.entry.goalNew || app.state.config.dailyNewTarget;
+  const mode = app.lastSession?.mode || 'learn';
+  const isLearn = mode === 'learn';
+  const goal = ctx.entry.goalNew || ctx.goalNew || app.state.config.dailyNewTarget;
   const met = ctx.entry.newLearned >= goal;
+  const title = mode === 'extra' ? '加练完成' : (isLearn ? (met ? '今天学完了' : '今天学到这儿') : '复习清空');
 
   return `
   <div class="page done">
     <img class="mascot" src="${MASCOT}" alt="" width="150" height="155" decoding="async">
-    <h1 class="done-title">${isLearn ? (met ? '今天学完了' : '今天学到这儿') : '复习清空'}</h1>
-    <p class="muted">${pickLine({ isLearn, met, streak: ctx.streak, newLearned: ctx.entry.newLearned, goal })}</p>
+    <h1 class="done-title">${title}</h1>
+    <p class="muted">${pickLine({ mode, met, streak: ctx.streak, newLearned: ctx.entry.newLearned, goal })}</p>
+    ${retryNote(app.lastSession)}
 
     <section class="meta three">
       <div class="meta-item"><b>${ctx.entry.newLearned}<em>/${goal}</em></b><span>今日新词</span></div>

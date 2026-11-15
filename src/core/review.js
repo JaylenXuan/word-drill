@@ -5,7 +5,11 @@
 import { todayKey } from './dates.js';
 import { createCard, schedule } from './scheduler.js';
 
-export function applyGrade(state, grade, wordId, today = todayKey(), now = new Date()) {
+/**
+ * @param {object} opts.goalNew 当天目标新词数。词库快学完时由调用方传入「剩余数」，
+ *                              否则永远够不到目标、最后几天必定断签。
+ */
+export function applyGrade(state, grade, wordId, today = todayKey(), now = new Date(), opts = {}) {
   // 没建过卡片的词一律视为新词：只在第一次评分时才落一张卡。
   // 这样 3632 词的词库，初始状态也只有几 KB，每次评分不必重写几百 KB。
   const card = state.cards[wordId] || createCard(wordId, state.config?.deckId || null, today);
@@ -17,10 +21,12 @@ export function applyGrade(state, grade, wordId, today = todayKey(), now = new D
 
   if (!state.daily[today]) {
     // 当天第一次操作时冻结目标值：之后改设置不影响今天的打卡判定
+    const fallback = Math.max(1, Number(state.config?.dailyNewTarget) || 10);
+    const goal = Number(opts.goalNew);
     state.daily[today] = {
       newLearned: 0,
       reviewsDone: 0,
-      goalNew: Math.max(1, Number(state.config?.dailyNewTarget) || 10),
+      goalNew: Number.isFinite(goal) && goal > 0 ? goal : fallback,
     };
   }
   const entry = state.daily[today];
