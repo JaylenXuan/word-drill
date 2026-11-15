@@ -3,6 +3,7 @@
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { addDays, daysBetween, todayKey, isValidKey } from '../src/core/dates.js';
 import { createCard, schedule, previewIntervals, GRADES, MIN_EASE, MAX_EASE, MAX_INTERVAL } from '../src/core/scheduler.js';
@@ -680,6 +681,67 @@ group('主屏安装（PWA 外壳）');
   test('明暗两套主题色都声明了（状态栏不串色）', () => {
     assert.match(html, /theme-color[^>]*#FBF9F5/i);
     assert.match(html, /theme-color[^>]*#141A2B/i);
+  });
+}
+
+// ---------- 离线能力 ----------
+group('离线能力（Service Worker）');
+{
+  const { PRECACHE, computeVersion } = await import('../tools/sw-manifest.mjs');
+  const swSrc = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  const repoRoot = new URL('..', import.meta.url);
+
+  test('sw.js 是最新的（版本号 == 现场算的哈希）', () => {
+    const inFile = swSrc.match(/const VERSION = '([^']+)'/)?.[1];
+    const actual = computeVersion();
+    assert.equal(inFile, actual, 'sw.js 过期了，跑一下 node tools/build-sw.mjs');
+  });
+  test('预缓存清单里的文件都真实存在', () => {
+    for (const rel of PRECACHE) {
+      assert.ok(readFileSync(new URL(rel, repoRoot)).length > 0, `${rel} 不存在或为空`);
+    }
+  });
+  test('sw.js 里列出的清单与 sw-manifest 一致', () => {
+    for (const rel of PRECACHE) {
+      assert.ok(swSrc.includes(`'./${rel}'`), `sw.js 漏了 ${rel}`);
+    }
+  });
+  test('app.js 依赖的所有模块都在预缓存里（防止新模块漏加）', () => {
+    const seen = new Set();
+    const walk = (rel) => {
+      if (seen.has(rel)) return;
+      seen.add(rel);
+      const src = readFileSync(new URL(rel, repoRoot), 'utf8');
+      for (const m of src.matchAll(/from '(\.[^']+)'/g)) {
+        walk(path.posix.normalize(path.posix.join(path.posix.dirname(rel), m[1])));
+      }
+    };
+    walk('src/ui/app.js');
+    const missing = [...seen].filter((f) => !PRECACHE.includes(f));
+    assert.deepEqual(missing, [], `这些模块没进预缓存：${missing.join(', ')}`);
+    assert.ok(seen.size >= 15, `只扫到 ${seen.size} 个模块，依赖图可能没解析对`);
+  });
+  test('index.html 引用的本地资源都在预缓存里', () => {
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    for (const m of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+      const ref = m[1];
+      if (/^https?:/.test(ref) || ref.endsWith('.webmanifest')) {
+        if (ref === 'manifest.webmanifest') assert.ok(PRECACHE.includes(ref), '清单没预缓存');
+        continue;
+      }
+      assert.ok(PRECACHE.includes(ref), `${ref} 没进预缓存`);
+    }
+  });
+  test('预缓存路径全是相对的（子路径部署的命门）', () => {
+    for (const rel of PRECACHE) {
+      assert.ok(!rel.startsWith('/'), `${rel} 是绝对路径，部署到 /word-drill/ 下会 404`);
+    }
+  });
+  test('manifest 的 id / start_url / scope 都是相对路径', () => {
+    const m = readJSON('../manifest.webmanifest');
+    for (const key of ['id', 'start_url', 'scope']) {
+      assert.equal(m[key], './', `${key} 应该是 './'`);
+    }
   });
 }
 

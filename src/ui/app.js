@@ -524,9 +524,35 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') flushLogs();
 });
 
+// ---------- Service Worker：离线可用 + 更新提示 ----------
+
+function registerServiceWorker() {
+  const nav = globalThis.navigator;
+  if (!nav || !('serviceWorker' in nav)) return;
+
+  const loc = globalThis.location;
+  const secure = loc && (loc.protocol === 'https:' || loc.hostname === '127.0.0.1' || loc.hostname === 'localhost');
+  if (!secure) return; // 局域网 http 下浏览器不提供 SW，静默跳过（不报错）
+
+  // 首次安装也会触发 controllerchange，那种情况不该弹「已更新」
+  const hadController = !!nav.serviceWorker.controller;
+
+  nav.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return;
+    // 不自动刷新：用户可能正停在一张卡中间
+    showToast('已更新到新版，刷新后生效');
+  });
+
+  nav.serviceWorker.register('sw.js').catch((err) => {
+    console.warn('[SW] 注册失败，联网照常可用', err);
+  });
+}
+
 boot().catch((e) => {
   console.error(e);
   root.innerHTML = `<div class="page"><h1 class="brand">出错了</h1>
     <p class="muted">${esc(e.message)}</p>
     <p class="muted small">如果是第一次打开，请确认是用 http 服务器访问的（不能双击 index.html）。</p></div>`;
 });
+
+registerServiceWorker();

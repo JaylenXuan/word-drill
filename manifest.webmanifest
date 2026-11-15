@@ -2,6 +2,7 @@
   "name": "背单词",
   "short_name": "背单词",
   "description": "雅思词汇真经 3632 词，只存在本机的背单词工具",
+  "id": "./",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",
