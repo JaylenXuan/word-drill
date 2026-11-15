@@ -1,4 +1,4 @@
-// 设置页：每日新词数 / 切换词库 / 备份与恢复 / 重置 / 关于
+﻿// 设置页：每日新词数 / 切换词库 / 备份与恢复 / 重置 / 关于
 import { esc } from '../dom.js';
 
 export function settingsView(app, ctx) {
@@ -83,7 +83,7 @@ export function settingsView(app, ctx) {
 
     <section class="card">
       <h2>关于</h2>
-      <div class="kv"><span>版本</span><span>0.6.0</span></div>
+      <div class="kv"><span>版本</span><span>0.7.0</span></div>
       <div class="kv"><span>词库</span><span>雅思词汇真经 ${ctx.total} 词</span></div>
       <div class="kv"><span>来源</span><span>github.com/hefengxian/my-ielts</span></div>
       <div class="kv"><span>协议</span><span>原仓库未声明 LICENSE，仅个人学习用</span></div>
@@ -92,4 +92,5 @@ export function settingsView(app, ctx) {
     </section>
   </div>`;
 }
+
 
