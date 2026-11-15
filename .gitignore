@@ -1,0 +1,15 @@
+# 临时文件（截图脚本、诊断脚本、数据备份副本）
+.tmp/
+_*.html
+_*.mjs
+_*.py
+*.zip
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/

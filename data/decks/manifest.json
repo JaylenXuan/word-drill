@@ -1,0 +1,20 @@
+{
+  "decks": [
+    {
+      "id": "ielts-core",
+      "name": "雅思词汇真经",
+      "tag": "IELTS",
+      "count": 3632,
+      "desc": "刘洪波《雅思词汇真经》，22 个话题分类",
+      "file": "ielts-core.json"
+    },
+    {
+      "id": "toefl-core",
+      "name": "托福学术 20",
+      "tag": "TOEFL",
+      "count": 20,
+      "desc": "示例词库，用来验证多词库切换",
+      "file": "toefl-core.json"
+    }
+  ]
+}

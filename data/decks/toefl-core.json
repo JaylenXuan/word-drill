@@ -1,0 +1,207 @@
+{
+  "id": "toefl-core",
+  "name": "托福学术 20",
+  "version": 1,
+  "words": [
+    {
+      "id": "toefl-001",
+      "word": "accumulate",
+      "phonetic": "/əˈkjuːmjəleɪt/",
+      "pos": "v.",
+      "meaning": "积累，堆积",
+      "enDef": "to increase gradually in quantity or number",
+      "example": "Sediment accumulates slowly over centuries.",
+      "exampleZh": "沉积物在数百年间缓慢堆积。"
+    },
+    {
+      "id": "toefl-002",
+      "word": "adjacent",
+      "phonetic": "/əˈdʒeɪsnt/",
+      "pos": "adj.",
+      "meaning": "邻近的，毗连的",
+      "enDef": "next to or very near something",
+      "example": "The laboratory is adjacent to the library.",
+      "exampleZh": "实验室与图书馆相邻。"
+    },
+    {
+      "id": "toefl-003",
+      "word": "anomaly",
+      "phonetic": "/əˈnɑːməli/",
+      "pos": "n.",
+      "meaning": "异常，反常现象",
+      "enDef": "something that differs from what is usual or expected",
+      "example": "This data point is an anomaly in the series.",
+      "exampleZh": "这个数据点是序列中的一处异常。"
+    },
+    {
+      "id": "toefl-004",
+      "word": "arbitrary",
+      "phonetic": "/ˈɑːrbətreri/",
+      "pos": "adj.",
+      "meaning": "任意的，武断的",
+      "enDef": "decided by chance or personal opinion rather than reason",
+      "example": "The boundary between the two regions is arbitrary.",
+      "exampleZh": "两个区域之间的界线是随意划定的。"
+    },
+    {
+      "id": "toefl-005",
+      "word": "catalyst",
+      "phonetic": "/ˈkætəlɪst/",
+      "pos": "n.",
+      "meaning": "催化剂；诱因",
+      "enDef": "something that speeds up a change or reaction",
+      "example": "Trade was a catalyst for urban growth.",
+      "exampleZh": "贸易是城市发展的催化剂。"
+    },
+    {
+      "id": "toefl-006",
+      "word": "chronology",
+      "phonetic": "/krəˈnɑːlədʒi/",
+      "pos": "n.",
+      "meaning": "年代顺序，年表",
+      "enDef": "the order in which a series of events happened",
+      "example": "The chronology of the site is still unclear.",
+      "exampleZh": "该遗址的年代顺序仍不清楚。"
+    },
+    {
+      "id": "toefl-007",
+      "word": "conduit",
+      "phonetic": "/ˈkɑːnduɪt/",
+      "pos": "n.",
+      "meaning": "管道；渠道",
+      "enDef": "a pipe or channel that carries something from one place to another",
+      "example": "The river is a conduit for sediment and nutrients.",
+      "exampleZh": "这条河是泥沙和养分的通道。"
+    },
+    {
+      "id": "toefl-008",
+      "word": "deplete",
+      "phonetic": "/dɪˈpliːt/",
+      "pos": "v.",
+      "meaning": "耗尽，使枯竭",
+      "enDef": "to reduce the amount of something until little is left",
+      "example": "Overfishing has depleted fish stocks worldwide.",
+      "exampleZh": "过度捕捞已使全球渔业资源枯竭。"
+    },
+    {
+      "id": "toefl-009",
+      "word": "disperse",
+      "phonetic": "/dɪˈspɜːrs/",
+      "pos": "v.",
+      "meaning": "散开，散布",
+      "enDef": "to spread over a wide area or in different directions",
+      "example": "Seeds disperse with the wind.",
+      "exampleZh": "种子随风散播。"
+    },
+    {
+      "id": "toefl-010",
+      "word": "dominant",
+      "phonetic": "/ˈdɑːmɪnənt/",
+      "pos": "adj.",
+      "meaning": "占主导地位的",
+      "enDef": "most important or most common in a place or group",
+      "example": "Grasses became dominant after the fire.",
+      "exampleZh": "火灾之后，禾草成了优势植被。"
+    },
+    {
+      "id": "toefl-011",
+      "word": "erode",
+      "phonetic": "/ɪˈroʊd/",
+      "pos": "v.",
+      "meaning": "侵蚀，逐渐削弱",
+      "enDef": "to wear away rock or soil gradually",
+      "example": "Waves erode the cliffs along the coast.",
+      "exampleZh": "海浪侵蚀着沿岸的悬崖。"
+    },
+    {
+      "id": "toefl-012",
+      "word": "exploit",
+      "phonetic": "/ɪkˈsplɔɪt/",
+      "pos": "v.",
+      "meaning": "利用，开发",
+      "enDef": "to use something fully for a purpose, sometimes unfairly",
+      "example": "Early farmers exploited the fertile river valleys.",
+      "exampleZh": "早期农耕者开发了肥沃的河谷。"
+    },
+    {
+      "id": "toefl-013",
+      "word": "fluctuate",
+      "phonetic": "/ˈflʌktʃueɪt/",
+      "pos": "v.",
+      "meaning": "波动，起伏",
+      "enDef": "to change often in level or amount",
+      "example": "Temperatures fluctuate seasonally in this region.",
+      "exampleZh": "该地区气温随季节波动。"
+    },
+    {
+      "id": "toefl-014",
+      "word": "hypothesis",
+      "phonetic": "/haɪˈpɑːθəsɪs/",
+      "pos": "n.",
+      "meaning": "假说，假设",
+      "enDef": "an idea that is suggested as an explanation and then tested",
+      "example": "The hypothesis was tested in the field.",
+      "exampleZh": "该假说在野外得到了检验。"
+    },
+    {
+      "id": "toefl-015",
+      "word": "intricate",
+      "phonetic": "/ˈɪntrɪkət/",
+      "pos": "adj.",
+      "meaning": "复杂精细的",
+      "enDef": "having many small parts or details arranged in a complex way",
+      "example": "Corals build intricate structures over decades.",
+      "exampleZh": "珊瑚用几十年时间筑起精细的结构。"
+    },
+    {
+      "id": "toefl-016",
+      "word": "migrate",
+      "phonetic": "/ˈmaɪɡreɪt/",
+      "pos": "v.",
+      "meaning": "迁徙，迁移",
+      "enDef": "to move from one region to another, often seasonally",
+      "example": "Birds migrate south in autumn.",
+      "exampleZh": "鸟类在秋季南迁。"
+    },
+    {
+      "id": "toefl-017",
+      "word": "perpetuate",
+      "phonetic": "/pərˈpetʃueɪt/",
+      "pos": "v.",
+      "meaning": "使持久，使延续",
+      "enDef": "to make something continue, often something unwanted",
+      "example": "The practice perpetuates inequality between groups.",
+      "exampleZh": "这种做法使群体间的不平等持续下去。"
+    },
+    {
+      "id": "toefl-018",
+      "word": "residue",
+      "phonetic": "/ˈrezɪduː/",
+      "pos": "n.",
+      "meaning": "残余物，残渣",
+      "enDef": "the small amount of something left after a process",
+      "example": "Chemical residue remained in the soil for years.",
+      "exampleZh": "化学残留物在土壤中留存了多年。"
+    },
+    {
+      "id": "toefl-019",
+      "word": "symmetrical",
+      "phonetic": "/sɪˈmetrɪkl/",
+      "pos": "adj.",
+      "meaning": "对称的",
+      "enDef": "having two halves that are exactly the same shape",
+      "example": "The building is almost perfectly symmetrical.",
+      "exampleZh": "这座建筑几乎完全对称。"
+    },
+    {
+      "id": "toefl-020",
+      "word": "thrive",
+      "phonetic": "/θraɪv/",
+      "pos": "v.",
+      "meaning": "繁荣，茁壮成长",
+      "enDef": "to grow well and be healthy or successful",
+      "example": "These plants thrive in deep shade.",
+      "exampleZh": "这些植物在浓荫下长得很好。"
+    }
+  ]
+}

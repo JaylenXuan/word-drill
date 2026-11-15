@@ -1,0 +1,590 @@
+# 例句中译搬运日志
+
+- 生成时间：2026-11-15T10:15:42.630Z
+- 脚本：tools/split-example-zh.mjs
+- 搬运 97 条：只把例句尾部的整句中文移到 exampleZh，中文内容原样保留
+- 未处理 3 条：中文夹在句子中间，拆分需要改写句子，留给你决定
+
+---
+
+### ielts0278 · bunch
+- example 原值：I bought a bunch of lilacs 我买了一束丁香花
+- example 新值：I bought a bunch of lilacs
+- exampleZh：我买了一束丁香花
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0281 · short-day
+- example 原值：Soybean is a typical short-day crop 大豆是典型的短日照作物
+- example 新值：Soybean is a typical short-day crop
+- exampleZh：大豆是典型的短日照作物
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0298 · decompose
+- example 原值：You can apply heat to decompose organic compounds 你可以加热来分解有机化合物
+- example 新值：You can apply heat to decompose organic compounds
+- exampleZh：你可以加热来分解有机化合物
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0316 · hay
+- example 原值：Make hay while sun shines 趁晴晒草，趁热打铁
+- example 新值：Make hay while sun shines
+- exampleZh：趁晴晒草，趁热打铁
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0324 · olive
+- example 原值：The olive branch is the emblem of peace. 橄榄枝是和平的象征
+- example 新值：The olive branch is the emblem of peace.
+- exampleZh：橄榄枝是和平的象征
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0329 · mint
+- example 原值：We sat in the back row, sucking mints 我们坐在后排，嘴里咂着薄荷糖
+- example 新值：We sat in the back row, sucking mints
+- exampleZh：我们坐在后排，嘴里咂着薄荷糖
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0330 · reef
+- example 原值：The ship was wrecked on a reef. 这船触礁失事了
+- example 新值：The ship was wrecked on a reef.
+- exampleZh：这船触礁失事了
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0343 · mechanism
+- example 原值：Bones and muscles are parts of the mechanism of the body骨骼和肌肉是身体构造的一部分
+- example 新值：Bones and muscles are parts of the mechanism of the body
+- exampleZh：骨骼和肌肉是身体构造的一部分
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0347 · conservation
+- example 原值：Some accommodation between conservation and tourism is essential. 对自然环境的保护和旅游业之前的相互协调是至关重要的 —— accommodation 除了有住宿还有和解协调的意思
+- example 新值：Some accommodation between conservation and tourism is essential.
+- exampleZh：对自然环境的保护和旅游业之前的相互协调是至关重要的 —— accommodation 除了有住宿还有和解协调的意思
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0412 · hatch
+- example 原值：Don't count the chickens before they are hatched 不要过早打如意算盘
+- example 新值：Don't count the chickens before they are hatched
+- exampleZh：不要过早打如意算盘
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0456 · bull
+- example 原值：He was a great bull of a man 他以前是个大块头
+- example 新值：He was a great bull of a man
+- exampleZh：他以前是个大块头
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0489 · hive
+- example 原值：This marketplace was once a hive of activity 一片繁忙景象
+- example 新值：This marketplace was once a hive of activity
+- exampleZh：一片繁忙景象
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0533 · subsistence
+- example 原值：The standard of living at that time was on the edge of subsistence 当时的生活水平处于勉强维生边缘
+- example 新值：The standard of living at that time was on the edge of subsistence
+- exampleZh：当时的生活水平处于勉强维生边缘
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0599 · circuit
+- example 原值：For many years, He was top banana on the circuit 许多年来，他都是巡回剧团里的主角——top banana主要人物
+- example 新值：For many years, He was top banana on the circuit
+- exampleZh：许多年来，他都是巡回剧团里的主角——top banana主要人物
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0840 · ounce
+- example 原值：An ounce of prevention is worth of a pound of cure 预防胜于治疗
+- example 新值：An ounce of prevention is worth of a pound of cure
+- exampleZh：预防胜于治疗
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts0855 · boil
+- example 原值：The watched pot never boils 性急烧水不沸
+- example 新值：The watched pot never boils
+- exampleZh：性急烧水不沸
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1133 · civilisation / civilization
+- example 原值：Western civilization was cradled in Ancient Greece 古希腊滋养了西方文明
+- example 新值：Western civilization was cradled in Ancient Greece
+- exampleZh：古希腊滋养了西方文明
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1134 · renaissance
+- example 原值：The Renaissance was an epoch of unparalleled cultural achievement 文艺复兴时期是一个在文化上取得空前成就的时代
+- example 新值：The Renaissance was an epoch of unparalleled cultural achievement
+- exampleZh：文艺复兴时期是一个在文化上取得空前成就的时代
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1139 · custom
+- example 原值：The custom prevails over the whole area 该风俗盛行于这整个地区
+- example 新值：The custom prevails over the whole area
+- exampleZh：该风俗盛行于这整个地区
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1145 · aboriginal
+- example 原值：Many Aboriginals do not like the idea of a day to celebrate the British landing. 许多澳大利亚土著并不喜欢庆祝英国人登陆的日子
+- example 新值：Many Aboriginals do not like the idea of a day to celebrate the British landing.
+- exampleZh：许多澳大利亚土著并不喜欢庆祝英国人登陆的日子
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1148 · local
+- example 原值：He provided local delicacies for his guests.他用当地的美味佳肴来招待客人
+- example 新值：He provided local delicacies for his guests.
+- exampleZh：他用当地的美味佳肴来招待客人
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1151 · alien
+- example 原值：I ran into an old friend in the alien land. 他乡遇故知
+- example 新值：I ran into an old friend in the alien land.
+- exampleZh：他乡遇故知
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1152 · anthropologist
+- example 原值：The anthropologist contrasted two cultures in his lecture. 这位人类学家在讲座中将两种文化进行对比
+- example 新值：The anthropologist contrasted two cultures in his lecture.
+- exampleZh：这位人类学家在讲座中将两种文化进行对比
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1162 · decorate
+- example 原值：Using extremely different decorating schemes in adjoining rooms may result in lack of unity in style. 相邻的房间用悬殊太大的装修方案会导致风格不统一
+- example 新值：Using extremely different decorating schemes in adjoining rooms may result in lack of unity in style.
+- exampleZh：相邻的房间用悬殊太大的装修方案会导致风格不统一
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1165 · etiquette
+- example 原值：He felt very sorry for his breach of etiquette. 他为他的失礼行为深感抱歉
+- example 新值：He felt very sorry for his breach of etiquette.
+- exampleZh：他为他的失礼行为深感抱歉
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1167 · soul
+- example 原值：No words can express the secret agony of my soul. 没有语言能够表达我心灵的隐痛
+- example 新值：No words can express the secret agony of my soul.
+- exampleZh：没有语言能够表达我心灵的隐痛
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1168 · spirit
+- example 原值：We need a spirit of enterprise if we are to overcome our difficulties. 如果要克服困难，我们就要有进取心
+- example 新值：We need a spirit of enterprise if we are to overcome our difficulties.
+- exampleZh：如果要克服困难，我们就要有进取心
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1173 · bishop
+- example 原值：I've heard a whisper that the bishop intends to leave. 我听到谣传说主教打算离开
+- example 新值：I've heard a whisper that the bishop intends to leave.
+- exampleZh：我听到谣传说主教打算离开
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1176 · Bible
+- example 原值：The Bible begins with the Genesis. 圣经的开篇是创世记
+- example 新值：The Bible begins with the Genesis.
+- exampleZh：圣经的开篇是创世记
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1179 · choir
+- example 原值：The choir sang the Amens beautifully. 唱诗班吟唱的“阿门”非常优美
+- example 新值：The choir sang the Amens beautifully.
+- exampleZh：唱诗班吟唱的“阿门”非常优美
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1182 · pagoda
+- example 原值：The pagoda perches on the top of the hill. 佛塔立在山顶上
+- example 新值：The pagoda perches on the top of the hill.
+- exampleZh：佛塔立在山顶上
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1184 · imperial
+- example 原值：They made an objection to the imperial system with resolution. 他们坚决反对这种帝国制度
+- example 新值：They made an objection to the imperial system with resolution.
+- exampleZh：他们坚决反对这种帝国制度
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1190 · queen
+- example 原值：They were bowing as the king and the queen walked in. 当国王和王后进来时，他们屈膝致敬
+- example 新值：They were bowing as the king and the queen walked in.
+- exampleZh：当国王和王后进来时，他们屈膝致敬
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1192 · princess
+- example 原值：The princess was ostracised for marrying a rich bourgeois man. 公主因与一位富有的资本家结婚而遭到排挤
+- example 新值：The princess was ostracised for marrying a rich bourgeois man.
+- exampleZh：公主因与一位富有的资本家结婚而遭到排挤
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1194 · nobility
+- example 原值：Virtue is the only true nobility. 万事不如美德高
+- example 新值：Virtue is the only true nobility.
+- exampleZh：万事不如美德高
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1200 · celebrity
+- example 原值：Celebrity, money and possessions are too often the touchstones for teenagers. 名誉、金钱和财产常常成为青少年们衡量事物的标准
+- example 新值：Celebrity, money and possessions are too often the touchstones for teenagers.
+- exampleZh：名誉、金钱和财产常常成为青少年们衡量事物的标准
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1207 · thrive
+- example 原值：First thrive and then wive. 先立业，后成家
+- example 新值：First thrive and then wive.
+- exampleZh：先立业，后成家
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1208 · prosperity
+- example 原值：The empire was on the wane after its period of prosperity. 帝国在经历繁盛之后逐渐衰落
+- example 新值：The empire was on the wane after its period of prosperity.
+- exampleZh：帝国在经历繁盛之后逐渐衰落
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1210 · adversity
+- example 原值：Hardship disposes man to meet adversity. 困苦使人们愿意去客户困境
+- example 新值：Hardship disposes man to meet adversity.
+- exampleZh：困苦使人们愿意去客户困境
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1220 · semantic
+- example 原值：There are two kinds of puns, phonetic pun and semantic pun. 双关语分为谐音双关语和语义双关语
+- example 新值：There are two kinds of puns, phonetic pun and semantic pun.
+- exampleZh：双关语分为谐音双关语和语义双关语
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1229 · utterance
+- example 原值：His every utterance will be scrutinized 他说的每句话都会被仔细审查
+- example 新值：His every utterance will be scrutinized
+- exampleZh：他说的每句话都会被仔细审查
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1426 · tent
+- example 原值：He drew back the tent flap and strode out into the blizzard 他拉开帐篷门帘，大步走进暴风雪中
+- example 新值：He drew back the tent flap and strode out into the blizzard
+- exampleZh：他拉开帐篷门帘，大步走进暴风雪中
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1488 · cushion
+- example 原值：She plumps up the sofa cushion 她把沙发垫拍得鼓鼓的
+- example 新值：She plumps up the sofa cushion
+- exampleZh：她把沙发垫拍得鼓鼓的
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1503 · strand
+- example 原值：One strand of silk doesn't make a thread; One tree doesn't make a forest 单丝不成线，独木不成林
+- example 新值：One strand of silk doesn't make a thread; One tree doesn't make a forest
+- exampleZh：单丝不成线，独木不成林
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1605 · popularity
+- example 原值：That record made the singer's popularity boom 那张唱片捧红了这位歌手
+- example 新值：That record made the singer's popularity boom
+- exampleZh：那张唱片捧红了这位歌手
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1618 · ornament
+- example 原值：Clearness ornaments profound thought 清晰性能为深刻的思想增辉
+- example 新值：Clearness ornaments profound thought
+- exampleZh：清晰性能为深刻的思想增辉
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1628 · decent
+- example 原值：He made a decent record 他成绩善佳
+- example 新值：He made a decent record
+- exampleZh：他成绩善佳
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1630 · grace
+- example 原值：She was a beautiful girl with the grace and poise of a natural model 她是一个美丽的女孩，天生有着模特的那种优雅仪态
+- example 新值：She was a beautiful girl with the grace and poise of a natural model
+- exampleZh：她是一个美丽的女孩，天生有着模特的那种优雅仪态
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1656 · clasp
+- example 原值：The button won't clasp 纽扣扣不上
+- example 新值：The button won't clasp
+- exampleZh：纽扣扣不上
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1667 · wrap
+- example 原值：Over her shoulders was a much-mended wrap 她的肩上搭着一条被多次缝补的披肩
+- example 新值：Over her shoulders was a much-mended wrap
+- exampleZh：她的肩上搭着一条被多次缝补的披肩
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1695 · patch
+- example 原值：She sewed a patch onto the knee of the trousers 她在裤子的膝部缝了个补丁
+- example 新值：She sewed a patch onto the knee of the trousers
+- exampleZh：她在裤子的膝部缝了个补丁
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1699 · colour / color
+- example 原值：Due to the use of natural pigments, these folk paintings retain their color well. 因为使用了天然颜料，这些民俗画的颜色很好地保留了下来
+- example 新值：Due to the use of natural pigments, these folk paintings retain their color well.
+- exampleZh：因为使用了天然颜料，这些民俗画的颜色很好地保留了下来
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1700 · white
+- example 原值：He was white with fury 他气的脸色发白
+- example 新值：He was white with fury
+- exampleZh：他气的脸色发白
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1756 · oven
+- example 原值：The bread is fresh out of the oven 新鲜出炉的面包
+- example 新值：The bread is fresh out of the oven
+- exampleZh：新鲜出炉的面包
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1775 · pea
+- example 原值：This kind of pea has a long pod（荚）
+- example 新值：This kind of pea has a long pod（
+- exampleZh：荚）
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1826 · loaf
+- example 原值：Half a loaf is better than no bread 聊胜于无
+- example 新值：Half a loaf is better than no bread
+- exampleZh：聊胜于无
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1858 · hunger
+- example 原值：His hunger was soon appeased 平息、和缓
+- example 新值：His hunger was soon appeased
+- exampleZh：平息、和缓
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1893 · site
+- example 原值：The construction site of a new shopping mall was a hive of activity 一片繁忙的景象
+- example 新值：The construction site of a new shopping mall was a hive of activity
+- exampleZh：一片繁忙的景象
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1914 · nursery
+- example 原值：The nursery teacher made the children sit bold upright 笔直坐
+- example 新值：The nursery teacher made the children sit bold upright
+- exampleZh：笔直坐
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1920 · porch
+- example 原值：A pigeon perched on our porch railing 一只鸽子栖息在我们门廊的栏杆上
+- example 新值：A pigeon perched on our porch railing
+- exampleZh：一只鸽子栖息在我们门廊的栏杆上
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts1955 · booth
+- example 原值：Would you please watch over my booth?请照料一下我的摊位号码？
+- example 新值：Would you please watch over my booth?
+- exampleZh：请照料一下我的摊位号码？
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2095 · liner
+- example 原值：The liner has been refitted from stern to stern 从头到尾整修
+- example 新值：The liner has been refitted from stern to stern
+- exampleZh：从头到尾整修
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2461 · law
+- example 原值：Those who break the law are subjected to justice. 违法者要受到法律的制裁
+- example 新值：Those who break the law are subjected to justice.
+- exampleZh：违法者要受到法律的制裁
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2517 · jury
+- example 原值：The jury will retire to consider its verdict today. 陪审团今天将退庭商议其e决
+- example 新值：The jury will retire to consider its verdict today.
+- exampleZh：陪审团今天将退庭商议其e决
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2547 · fool
+- example 原值：A fool's haste is no speed. 欲速则不达
+- example 新值：A fool's haste is no speed.
+- exampleZh：欲速则不达
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2587 · spark
+- example 原值：A single spark can start a prairie fire. 星星之火可以燎原
+- example 新值：A single spark can start a prairie fire.
+- exampleZh：星星之火可以燎原
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2592 · missile
+- example 原值：A hand-grenade is a missile weapon 手榴弹是一种投掷武器
+- example 新值：A hand-grenade is a missile weapon
+- exampleZh：手榴弹是一种投掷武器
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2603 · glow
+- example 原值：Maple leaves glowed red in the sunlight 枫叶在阳光里闪耀着红光
+- example 新值：Maple leaves glowed red in the sunlight
+- exampleZh：枫叶在阳光里闪耀着红光
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2618 · strike
+- example 原值：The strike has delivered a heavy blow to the management 这场罢工给了资方一个沉重的打击
+- example 新值：The strike has delivered a heavy blow to the management
+- exampleZh：这场罢工给了资方一个沉重的打击
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2619 · punch
+- example 原值：Spectators cheered at his knockout punch 观众为他击倒对手的一拳而喝彩
+- example 新值：Spectators cheered at his knockout punch
+- exampleZh：观众为他击倒对手的一拳而喝彩
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2626 · destitute
+- example 原值：The floods left many people destitute 水灾使很多人一无所有
+- example 新值：The floods left many people destitute
+- exampleZh：水灾使很多人一无所有
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2642 · siege
+- example 原值：The TV station has been under siege from irate viewers phoning in to complain 电视被愤怒的观众围攻，一直打电话来抱怨
+- example 新值：The TV station has been under siege from irate viewers phoning in to complain
+- exampleZh：电视被愤怒的观众围攻，一直打电话来抱怨
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2646 · halt
+- example 原值：The cab rolled to a halt before the hotel 计程车缓缓地停在了酒店前
+- example 新值：The cab rolled to a halt before the hotel
+- exampleZh：计程车缓缓地停在了酒店前
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2647 · cease
+- example 原值：At last, they ceased working for lack of capital 他们最终由于缺乏资金停工了
+- example 新值：At last, they ceased working for lack of capital
+- exampleZh：他们最终由于缺乏资金停工了
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2655 · revolt
+- example 原值：Autocracy often causes the people to revolt 独裁统治常常引起人民的反抗
+- example 新值：Autocracy often causes the people to revolt
+- exampleZh：独裁统治常常引起人民的反抗
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2662 · reproach
+- example 原值：His manners are beyond reproach 他的举止无可指摘
+- example 新值：His manners are beyond reproach
+- exampleZh：他的举止无可指摘
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2672 · tension
+- example 原值：Tension mounted as we waited for the exam results to be published 在我们等待公布考试成绩时，气氛越来越紧张
+- example 新值：Tension mounted as we waited for the exam results to be published
+- exampleZh：在我们等待公布考试成绩时，气氛越来越紧张
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2674 · turmoil
+- example 原值：The demonstration turned into turmoil 示威演变成了骚乱
+- example 新值：The demonstration turned into turmoil
+- exampleZh：示威演变成了骚乱
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2694 · refute
+- example 原值：He had hardly finished when someone rose to refute his points 他还没有说完，就有人起来驳斥他的观点
+- example 新值：He had hardly finished when someone rose to refute his points
+- exampleZh：他还没有说完，就有人起来驳斥他的观点
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2698 · impair
+- example 原值：If a witness is allowed to withhold information, it impairs the legal process 如果允许证人知情不报，会妨碍法律程序
+- example 新值：If a witness is allowed to withhold information, it impairs the legal process
+- exampleZh：如果允许证人知情不报，会妨碍法律程序
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2699 · mitigate
+- example 原值：Nothing could mitigate the cruelty with which she had treated him 她对他太残暴了，没有什么能为她开脱
+- example 新值：Nothing could mitigate the cruelty with which she had treated him
+- exampleZh：她对他太残暴了，没有什么能为她开脱
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2707 · fierce
+- example 原值：They launched a fierce attack against the enemy position 他们向敌人的阵地发起了猛烈的进攻
+- example 新值：They launched a fierce attack against the enemy position
+- exampleZh：他们向敌人的阵地发起了猛烈的进攻
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2708 · foul
+- example 原值：The foul weather spoiled our vacation 恶劣的天气毁了我们的假期
+- example 新值：The foul weather spoiled our vacation
+- exampleZh：恶劣的天气毁了我们的假期
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2710 · devil
+- example 原值：That enemy officer is the devil incarnate 他是魔鬼的化身
+- example 新值：That enemy officer is the devil incarnate
+- exampleZh：他是魔鬼的化身
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2749 · withstand
+- example 原值：The bridge is built to withstand an earthquake of 8.0 magnitude 这座桥可以经受 8 级地震
+- example 新值：The bridge is built to withstand an earthquake of 8.0 magnitude
+- exampleZh：这座桥可以经受 8 级地震
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts2945 · curse
+- example 原值：A light purse is a heavy curse 贫穷是沉重的诅咒
+- example 新值：A light purse is a heavy curse
+- exampleZh：贫穷是沉重的诅咒
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3014 · contempt
+- example 原值：A liar is held in contempt 说谎者为人所轻视
+- example 新值：A liar is held in contempt
+- exampleZh：说谎者为人所轻视
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3036 · bait
+- example 原值：He is known for baiting his opponents. 众所周知，他善于激怒对手
+- example 新值：He is known for baiting his opponents.
+- exampleZh：众所周知，他善于激怒对手
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3185 · skull
+- example 原值：He can't seem to get it into his skull that I'm just not interested in him 他似乎无法理解我对他没有兴趣
+- example 新值：He can't seem to get it into his skull that I'm just not interested in him
+- exampleZh：他似乎无法理解我对他没有兴趣
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3194 · lip
+- example 原值：They came to the lip of a dead crater 死火山口
+- example 新值：They came to the lip of a dead crater
+- exampleZh：死火山口
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3195 · mouth
+- example 原值：They gave him mouth-to-mouth resuscitation and heart massage 人工呼吸和心脏按摩
+- example 新值：They gave him mouth-to-mouth resuscitation and heart massage
+- exampleZh：人工呼吸和心脏按摩
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3199 · chin
+- example 原值：Ben caught him on the chin with a uppercut 本一记上勾拳击中了他的下巴
+- example 新值：Ben caught him on the chin with a uppercut
+- exampleZh：本一记上勾拳击中了他的下巴
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3209 · finger
+- example 原值：My fingers prick 刺痛
+- example 新值：My fingers prick
+- exampleZh：刺痛
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3214 · waist
+- example 原值：She took in the waist of her dress 她把裙子的腰身改小了
+- example 新值：She took in the waist of her dress
+- exampleZh：她把裙子的腰身改小了
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3221 · gland
+- example 原值：His internal secretary gland can not work 内分泌腺
+- example 新值：His internal secretary gland can not work
+- exampleZh：内分泌腺
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3507 · hatred
+- example 原值：His words stirred up my hatred. 他的话激起了我的仇恨
+- example 新值：His words stirred up my hatred.
+- exampleZh：他的话激起了我的仇恨
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段
+
+### ielts3510 · vex
+- example 原值：She was vexed at her failure. 她因失败而恼火
+- example 新值：She was vexed at her failure.
+- exampleZh：她因失败而恼火
+- 理由：中文是这句英文的整句翻译，原来粘在 example 里，搬进专用字段

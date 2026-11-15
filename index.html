@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>背单词</title>
+
+  <!-- 主屏安装：iOS 走 apple-* 这组，Android/桌面走 manifest -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/whale/icons/apple-touch-icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="背单词" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- 状态栏/地址栏颜色跟随明暗 -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBF9F5" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141A2B" />
+
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 首屏占位：脚本加载后由 src/ui/app.js 接管 -->
+    <main class="page">
+      <h1 class="brand">背单词</h1>
+      <p class="muted">正在加载…</p>
+    </main>
+  </div>
+  <noscript>需要开启 JavaScript 才能使用。</noscript>
+  <script type="module" src="src/ui/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+# 词库修订日志
+
+- 生成时间：2026-11-15T10:15:42.403Z
+- 脚本：tools/fix-deck.mjs（依据 tools/deck-fixes.json）
+- 词库：data/decks/ielts-core.json（3632 词）
+- 本次修改：**69 条**（拼写 51、大小写 10、语法 7、词性 1）
+
+> 只修三类：拼写错误、词性与词形不符、例句语法崩坏。
+> 不做措辞优化、不改释义、不改单词本身。
+
+---
+
+## 拼写（51 条）
+
+### ielts0039 · volcano · example
+- 原值：The valcano erupted and two small towns were buried under meters of hot ash, mud and bits of molten rock
+- 新值：The volcano erupted and two small towns were buried under meters of hot ash, mud and bits of molten rock
+- 理由：volcano 拼成 valcano
+
+### ielts0043 · smog · example
+- 原值：The smog was so bad that school children were adviced to stay indoors
+- 新值：The smog was so bad that school children were advised to stay indoors
+- 理由：advise 的过去分词是 advised
+
+### ielts0115 · arid · example
+- 原值：It is difficult to grow food in arid dessert areas
+- 新值：It is difficult to grow food in arid desert areas
+- 理由：沙漠是 desert，dessert 是甜点（同音误写）
+
+### ielts0185 · grand · example
+- 原值：He was born in the purple and was brougt up in the grand palace
+- 新值：He was born in the purple and was brought up in the grand palace
+- 理由：bring 的过去分词是 brought
+
+### ielts0187 · super · example
+- 原值：I've discoverd a super restaurant near here
+- 新值：I've discovered a super restaurant near here
+- 理由：漏字母 e
+
+### ielts0190 · wilderness · example
+- 原值：From his attic window, he looked out over a beautiful wildernes
+- 新值：From his attic window, he looked out over a beautiful wilderness
+- 理由：wilderness 漏 s
+
+### ielts0194 · fertile · example
+- 原值：There's enough to ransform barrel coral atolls into fertile groves
+- 新值：There's enough to transform barrel coral atolls into fertile groves
+- 理由：漏字母 t
+
+### ielts0197 · lunar · example
+- 原值：All traditional Chinese festivals are lunar callendar festivals
+- 新值：All traditional Chinese festivals are lunar calendar festivals
+- 理由：calendar 无连写 ll
+
+### ielts0230 · environment · example
+- 原值：An incresing number of people are concerned about the pollution of the environment
+- 新值：An increasing number of people are concerned about the pollution of the environment
+- 理由：漏字母 a
+
+### ielts0236 · artificial · example
+- 原值：This fruit joice contains absolutely no artificial flavorings or colorings
+- 新值：This fruit juice contains absolutely no artificial flavorings or colorings
+- 理由：juice 拼成 joice
+
+### ielts0243 · respire · example
+- 原值：Plants respire in the same way as animals, taking in oxygen and giveing out carbon dioxide
+- 新值：Plants respire in the same way as animals, taking in oxygen and giving out carbon dioxide
+- 理由：去 e 加 ing
+
+### ielts0279 · vase · example
+- 原值：This flaw makes the vase less valable
+- 新值：This flaw makes the vase less valuable
+- 理由：valuable 拼成 valable
+
+### ielts0303 · jungle · example
+- 原值：Tigets are found in the jungle of Asia
+- 新值：Tigers are found in the jungle of Asia
+- 理由：tiger 拼成 tiget
+
+### ielts0308 · charcoal · example
+- 原值：Preare a fire in a charcoal grill
+- 新值：Prepare a fire in a charcoal grill
+- 理由：漏字母 p
+
+### ielts0311 · forestry · example
+- 原值：Mountainous areas covered with forests are the very place for foresty development
+- 新值：Mountainous areas covered with forests are the very place for forestry development
+- 理由：forestry 漏 r
+
+### ielts0344 · counterbalance · example
+- 原值：Their strength in defense couterbalances our strength in attack
+- 新值：Their strength in defense counterbalances our strength in attack
+- 理由：漏字母 n
+
+### ielts0351 · ruin · example
+- 原值：The stome ruinned the crops
+- 新值：The storm ruined the crops
+- 理由：stome→storm（不是 stove）、ruinned→ruined，两处拼错
+
+### ielts0525 · prey · example
+- 原值：snacks track their prey by its scent
+- 新值：snakes track their prey by its scent
+- 理由：追踪猎物的是蛇（snakes），不是零食
+
+### ielts0664 · outstanding · example
+- 原值：He is an outstanding athelete and deserved to win
+- 新值：He is an outstanding athlete and deserved to win
+- 理由：athlete 多写 e
+
+### ielts0716 · accommodation · example
+- 原值：The authorities must provide suitble accommodation for the family
+- 新值：The authorities must provide suitable accommodation for the family
+- 理由：suitable 漏 a
+
+### ielts0796 · subtract · example
+- 原值：The littel girl has begun to learn to add and subtract
+- 新值：The little girl has begun to learn to add and subtract
+- 理由：字母顺序错误
+
+### ielts1010 · reward · example
+- 原值：Virture is its own reward
+- 新值：Virtue is its own reward
+- 理由：virtue 拼成 virture
+
+### ielts1131 · circumstance · example
+- 原值：Circumtances are the ruler of the weak, the instrument of the wise
+- 新值：Circumstances are the ruler of the weak, the instrument of the wise
+- 理由：漏字母 s
+
+### ielts1238 · vocabulary · example
+- 原值：His vocabulary was sound and his grammer was excellent
+- 新值：His vocabulary was sound and his grammar was excellent
+- 理由：grammar 拼成 grammer
+
+### ielts1328 · craftsman · example
+- 原值：The original designes were made by highly skilled craftsmen
+- 新值：The original designs were made by highly skilled craftsmen
+- 理由：design 的复数是 designs
+
+### ielts1346 · carve · example
+- 原值：The statue was carved out of mable
+- 新值：The statue was carved out of marble
+- 理由：marble 拼成 mable
+
+### ielts1464 · trash · example
+- 原值：Trash can do a great demage to the environment
+- 新值：Trash can do a great damage to the environment
+- 理由：damage 拼成 demage
+
+### ielts1474 · shampoo · example
+- 原值：She weted her hair and then put shampoo on it
+- 新值：She wet her hair and then put shampoo on it
+- 理由：wet 的过去式不是 weted
+
+### ielts1501 · cable · example
+- 原值：This country has almost 15 milliion subscribers to satellite and cable television
+- 新值：This country has almost 15 million subscribers to satellite and cable television
+- 理由：多写字母 i
+
+### ielts1543 · portable · example
+- 原值：The new portale computers are selling like hot cakes
+- 新值：The new portable computers are selling like hot cakes
+- 理由：portable 拼成 portale
+
+### ielts1708 · stain · example
+- 原值：The coffe stained her shirt brown
+- 新值：The coffee stained her shirt brown
+- 理由：coffee 漏 e
+
+### ielts2026 · airplane · example
+- 原值：An airplane engine is a complex machanism
+- 新值：An airplane engine is a complex mechanism
+- 理由：mechanism 拼成 machanism
+
+### ielts2246 · flourish · example
+- 原值：Plants will not flurish without water
+- 新值：Plants will not flourish without water
+- 理由：漏字母 o
+
+### ielts2499 · session · example
+- 原值：The general sesion approved the report of the investigation committee
+- 新值：The general session approved the report of the investigation committee
+- 理由：session 漏 s
+
+### ielts2532 · vice · example
+- 原值：Virtue and vise are two different things: the former leads to peace, the latter to misery
+- 新值：Virtue and vice are two different things: the former leads to peace, the latter to misery
+- 理由：恶习是 vice，vise 是台钳（同音误写）
+
+### ielts2674 · turmoil · example
+- 原值：The demostration turned into turmoil 示威演变成了骚乱
+- 新值：The demonstration turned into turmoil 示威演变成了骚乱
+- 理由：demonstration 漏 n
+
+### ielts2679 · rein · example
+- 原值：The hourse responds to the slightest pull on the rein
+- 新值：The horse responds to the slightest pull on the rein
+- 理由：horse 拼成 hourse
+
+### ielts2745 · interrupt · example
+- 原值：Execuse me, I wonder if I could interrupt you
+- 新值：Excuse me, I wonder if I could interrupt you
+- 理由：excuse 拼成 execuse
+
+### ielts2752 · escape · example
+- 原值：To my suprise, he managed to escape from that big fire
+- 新值：To my surprise, he managed to escape from that big fire
+- 理由：surprise 漏 r
+
+### ielts2803 · cousin · example
+- 原值：For our first anniversary, he's taking me to his cousin's cabi
+- 新值：For our first anniversary, he's taking me to his cousin's cabin
+- 理由：cabin 拼成 cabi
+
+### ielts2811 · youngster · example
+- 原值：These youngsters yarn for an adventure in the wild
+- 新值：These youngsters yearn for an adventure in the wild
+- 理由：渴望是 yearn，yarn 是纱线
+
+### ielts2878 · chancellor · example
+- 原值：In Britain, the chancelllor of the exchequer deals with the taxes and government spending
+- 新值：In Britain, the chancellor of the exchequer deals with the taxes and government spending
+- 理由：多写字母 l
+
+### ielts3241 · habit · example
+- 原值：He is in a habbit of rising early
+- 新值：He is in a habit of rising early
+- 理由：habit 多写字母 b
+
+### ielts3253 · awake · example
+- 原值：The children sare still wide awake
+- 新值：The children are still wide awake
+- 理由：be 动词写错成 sare
+
+### ielts3365 · recovery · example
+- 原值：We are suprised by the speed of her recovery
+- 新值：We are surprised by the speed of her recovery
+- 理由：surprised 漏 r
+
+### ielts3391 · joy · example
+- 原值：He is in a mesurable joy
+- 新值：He is in a measurable joy
+- 理由：measurable 漏 a
+
+### ielts3525 · vulgar · example
+- 原值：Vulgar fashions filled the store windowns
+- 新值：Vulgar fashions filled the store windows
+- 理由：windows 拼成 windowns
+
+### ielts3573 · greedy · example
+- 原值：The greedy man is alway needy
+- 新值：The greedy man is always needy
+- 理由：always 漏 s
+
+### ielts3630 · periodically · example
+- 原值：Sea mammals must emerge periodically to breath
+- 新值：Sea mammals must emerge periodically to breathe
+- 理由：不定式要用动词 breathe，breath 是名词
+
+### ielts0563 · vent · example
+- 原值：When gases and steam can get vented from a valcano's cracks, it's probably not about to erupt
+- 新值：When gases and steam can get vented from a volcano's cracks, it's probably not about to erupt
+- 理由：volcano 拼成 valcano（与 ielts0039 同一处错误，两条例句都中招）
+
+### ielts0841 · density · example
+- 原值：The population density of big cities is incresing year by year
+- 新值：The population density of big cities is increasing year by year
+- 理由：increasing 漏 a（与 ielts0230 同源）
+
+## 大小写（10 条）
+
+### ielts0158 · inappropriate · example
+- 原值：our bright red coat would be quite inappropriate for a funeral
+- 新值：Our bright red coat would be quite inappropriate for a funeral
+- 理由：句子开头未大写
+
+### ielts0525 · prey · example
+- 原值：snakes track their prey by its scent
+- 新值：Snakes track their prey by its scent
+- 理由：句子开头未大写
+
+### ielts0529 · defensive · example
+- 原值：we took a defensive attitude in the negotiation
+- 新值：We took a defensive attitude in the negotiation
+- 理由：句子开头未大写
+
+### ielts0819 · rectangle · example
+- 原值：the plate itself is a small rectangle made of gold
+- 新值：The plate itself is a small rectangle made of gold
+- 理由：句子开头未大写
+
+### ielts0869 · mixture · example
+- 原值：her new play is mixture of sadness and humour
+- 新值：Her new play is mixture of sadness and humour
+- 理由：句子开头未大写
+
+### ielts1840 · wasabi · example
+- 原值：sashimi is usually served with soy sauce and wasabi paste
+- 新值：Sashimi is usually served with soy sauce and wasabi paste
+- 理由：句子开头未大写
+
+### ielts2524 · confine · example
+- 原值：this is outside the confines of human knowledge
+- 新值：This is outside the confines of human knowledge
+- 理由：句子开头未大写
+
+### ielts2620 · chop · example
+- 原值：onions must be chopped up to make a salad
+- 新值：Onions must be chopped up to make a salad
+- 理由：句子开头未大写
+
+### ielts3090 · gain · example
+- 原值：every time they reap gains from their investment, more people wish to join them
+- 新值：Every time they reap gains from their investment, more people wish to join them
+- 理由：句子开头未大写
+
+### ielts3236 · hormone · example
+- 原值：hormones can control certain organs with your body
+- 新值：Hormones can control certain organs with your body
+- 理由：句子开头未大写
+
+## 语法（7 条）
+
+### ielts0019 · endanger · example
+- 原值：If you are work hard without rest, you will endanger your health
+- 新值：If you work hard without rest, you will endanger your health
+- 理由：be 动词与原形动词重复（are work）
+
+### ielts0218 · drain · example
+- 原值：They drained the swamp and turn it into fertile land
+- 新值：They drained the swamp and turned it into fertile land
+- 理由：与前面的 drained 时态不一致
+
+### ielts0267 · pluck · example
+- 原值：The pluck a rose for his lover
+- 新值：They plucked a rose for his lover
+- 理由：主语残缺（The）+ 谓语未用过去式
+
+### ielts0289 · bud · example
+- 原值：The rose are in bud
+- 新值：The roses are in bud
+- 理由：主谓数不一致（rose are）
+
+### ielts0597 · signal · example
+- 原值：Her speech yesterday was a signal that her her view has changed
+- 新值：Her speech yesterday was a signal that her view has changed
+- 理由：重复词
+
+### ielts1635 · make-up · example
+- 原值：I cannot tell who's who when the women take off their their make-up
+- 新值：I cannot tell who's who when the women take off their make-up
+- 理由：重复词
+
+### ielts3236 · hormone · example
+- 原值：Hormones can control certain organs with your body
+- 新值：Hormones can control certain organs in your body
+- 理由：介词误用，体内应为 in
+
+## 词性（1 条）
+
+### ielts3369 · alleviate · pos
+- 原值：n.
+- 新值：v.
+- 理由：alleviate 是动词，释义也是动词义「减轻；缓解」
