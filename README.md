@@ -3,6 +3,8 @@
 只服务一个人的背单词网页：雅思词汇真经 3632 词，本地存储，零依赖、零构建、零后端。
 移动端优先，目标是加到 iPhone 主屏、每天点开就能学。
 
+**线上地址：<https://jaylenxuan.github.io/word-drill/>**（GitHub Pages，推 main 自动重建）
+
 | 首页 | 卡片 | 完成页 | 首次引导 |
 |---|---|---|---|
 | ![首页](docs/home.png) | ![卡片](docs/card.png) | ![完成页](docs/done.png) | ![引导](docs/onboard.png) |
