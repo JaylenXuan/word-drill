@@ -1,11 +1,23 @@
 ﻿// 设置页：每日新词数 / 切换词库 / 备份与恢复 / 重置 / 关于
 import { esc } from '../dom.js';
 import { backupAgeDays, backupOverdue } from '../prefs.js';
+import { auditNewWords } from '../../core/audit.js';
 
 export function settingsView(app, ctx) {
   const cfg = app.state.config;
   const target = cfg.dailyNewTarget;
   const eta = ctx.total ? Math.ceil((ctx.newLeftInDeck || 0) / Math.max(1, target)) : 0;
+
+  // 今日新词自查：计数 vs 复习日志里的独立记录
+  let auditText = '';
+  try {
+    const reviews = app.storage?.getReviews?.() || [];
+    const a = auditNewWords(app.state, reviews, ctx.today);
+    auditText = `${a.counted} / 日志 ${a.logged} ${a.ok ? '✓' : '⚠ 不一致'}`;
+  } catch {
+    auditText = '无法核对';
+  }
+  const auditBad = auditText.includes('不一致');
 
   // 当前是主屏 App 还是 Safari 标签页（两套 localStorage，跑错容器就会「数据变空」）
   const standalone = !!(
@@ -74,6 +86,8 @@ export function settingsView(app, ctx) {
       <div class="kv"><span>当前环境</span><span>${standalone ? '主屏 App（数据独立于 Safari）' : 'Safari 标签页'}</span></div>
       <div class="kv"><span>上次备份</span><span class="${overdue ? 'warn-text' : ''}">${backupText}</span></div>
       <div class="kv"><span>持久化存储</span><span>${persistText}</span></div>
+      <div class="kv"><span>今日新词核对</span><span class="${auditBad ? 'warn-text' : ''}">${auditText}</span></div>
+      <p class="muted small">「今日新词」按不同单词计数，同一个词补考多少次都只算 1 个。这一行把计数和复习日志对了一遍，两个数字一致才打勾。</p>
       <p class="muted small">数据只存在这台设备的浏览器里。换手机、清缓存、删主屏图标之前请先导出。</p>
       <div class="actions">
         <button class="primary" data-action="export-download">导出备份文件</button>
@@ -107,7 +121,7 @@ export function settingsView(app, ctx) {
 
     <section class="card">
       <h2>关于</h2>
-      <div class="kv"><span>版本</span><span>0.9.0</span></div>
+      <div class="kv"><span>版本</span><span>0.9.1</span></div>
       <div class="kv"><span>词库</span><span>雅思词汇真经 ${ctx.total} 词</span></div>
       <div class="kv"><span>来源</span><span>github.com/hefengxian/my-ielts</span></div>
       <div class="kv"><span>协议</span><span>原仓库未声明 LICENSE，仅个人学习用</span></div>
@@ -117,6 +131,7 @@ export function settingsView(app, ctx) {
     </section>
   </div>`;
 }
+
 
 
 

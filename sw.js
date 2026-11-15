@@ -2,7 +2,7 @@
  * 生成命令：node tools/build-sw.mjs
  * 版本号 = 预缓存清单里所有文件的 sha256 前 12 位，任何文件变化都会变。
  */
-const VERSION = 'wd-1474dd93d1f8';
+const VERSION = 'wd-8961e01e08d5';
 const SHELL = 'shell-' + VERSION;
 const RUNTIME = 'runtime-v1';
 const NETWORK_TIMEOUT = 3500;
@@ -27,6 +27,7 @@ const PRECACHE = [
   './src/ui/views/session.js',
   './src/ui/views/settings.js',
   './src/ui/views/stats.js',
+  './src/core/audit.js',
   './src/core/dates.js',
   './src/core/queue.js',
   './src/core/review.js',

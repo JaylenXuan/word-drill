@@ -14,6 +14,7 @@ import {
   STATE_KEY,
 } from '../src/core/storage.js';
 import { applyGrade } from '../src/core/review.js';
+import { auditNewWords } from '../src/core/audit.js';
 import { createSound } from '../src/ui/sound.js';
 import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from '../src/ui/prefs.js';
 import { buildSession, currentItem, gradeSession, isFinished, remaining, sessionSummary, progress, MAX_RETRY } from '../src/core/session.js';
@@ -638,6 +639,79 @@ group('今日新词口径（补考不占名额、不重复计数）');
     assert.equal(st.daily[T0].goalNew, 3, '目标被封顶为剩余数');
     assert.equal(dayMet(st.daily[T0]), true, '最后一天不该断签');
     assert.equal(computeStreak(st.daily, T0).current, 1);
+  });
+}
+
+// ---------- 今日新词计数审计 ----------
+group('今日新词计数审计（随机 6 天 × 中途退出 × 补考）');
+{
+  test('计数与复习日志逐日对齐', () => {
+    let seed = 20261115;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const pick = () => (rnd() < 0.35 ? 'again' : rnd() < 0.5 ? 'hard' : 'good');
+
+    const storage = createStorage(memoryAdapter());
+    let state = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const words = ielts.words.slice(0, 80);
+    const firstGradedOn = new Map();
+    const reviews = [];
+    const bad = [];
+
+    for (let day = 0; day < 4; day += 1) {
+      const today = addDays(T0, day);
+      state.config.dailyNewTarget = 5 + Math.floor(rnd() * 15);
+      const goal = state.config.dailyNewTarget;
+
+      for (let v = 0; v < 3; v += 1) {
+        const pool = rnd() < 0.7
+          ? buildNewQueue(words, state.cards, state.config, state.daily, today)
+          : buildReviewQueue(state.cards, today);
+        if (!pool.length) continue;
+        const take = 1 + Math.floor(rnd() * Math.min(12, pool.length));
+        const s = buildSession(rnd() < 0.7 ? 'learn' : 'review', pool.slice(0, take));
+        let n = 0;
+        while (!isFinished(s)) {
+          if (n >= 2 && rnd() < 0.15) break; // 中途退出
+          const item = currentItem(s);
+          const grade = pick();
+          const wasNew = (state.cards[item.id]?.state ?? 'new') === 'new';
+          const r = applyGrade(state, grade, item.id, today, new Date(`${today}T20:00:00`), { goalNew: goal });
+          if (wasNew) firstGradedOn.set(item.id, today);
+          reviews.push(r.log);
+          gradeSession(s, grade);
+          n += 1;
+        }
+        storage.save(state);
+        state = storage.load().state; // 杀进程再打开
+      }
+
+      const truth = [...firstGradedOn.values()].filter((d) => d === today).length;
+      const a = auditNewWords(state, reviews, today);
+      if (!(a.ok && a.counted === truth)) bad.push(`${today}: 计数 ${a.counted} 真值 ${truth} 日志 ${a.logged}`);
+    }
+    assert.deepEqual(bad, [], '有天数对不上');
+    assert.ok(Object.keys(state.cards).length > 20, '样本太小，没测到什么');
+  });
+  test('同一个词当天评 4 次，只算 1 个新词', () => {
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const reviews = [];
+    for (let i = 0; i < 4; i += 1) {
+      const r = applyGrade(st, 'again', 'ielts0001', T0, new Date(`${T0}T20:00:00`), { goalNew: 10 });
+      reviews.push(r.log);
+    }
+    const a = auditNewWords(st, reviews, T0);
+    assert.equal(a.counted, 1);
+    assert.equal(a.logged, 1);
+    assert.equal(a.ok, true);
+    assert.equal(st.daily[T0].reviewsDone, 3);
+  });
+  test('审计能发现人为制造的不一致', () => {
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const r = applyGrade(st, 'good', 'ielts0001', T0, new Date(`${T0}T20:00:00`), { goalNew: 10 });
+    const a = auditNewWords(st, [r.log], T0);
+    assert.equal(a.ok, true);
+    st.daily[T0].newLearned = 5; // 人为改坏
+    assert.equal(auditNewWords(st, [r.log], T0).ok, false);
   });
 }
 
