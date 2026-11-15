@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>背单词</title>
+  <meta name="build" content="0.9.2" />
 
   <!-- 主屏安装：iOS 走 apple-* 这组，Android/桌面走 manifest -->
   <link rel="manifest" href="manifest.webmanifest" />
@@ -19,6 +20,53 @@
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141A2B" />
 
   <link rel="stylesheet" href="src/styles.css" />
+
+  <!--
+    版本自愈（只清 Service Worker 和离线缓存，绝不动 localStorage）。
+
+    为什么需要它：这个文档是「网络优先」拿到的，永远是最新的；
+    但它引用的 JS 由 Service Worker 缓存优先返回，可能是上一个版本。
+    浏览器对 sw.js 的自动复查有 24 小时上限，所以升级后可能长时间卡在旧版。
+
+    做法：HTML 里带一个有构建号，和上次记录的不一致、且当前已被旧 SW 接管时，
+    注销 SW + 删掉所有 cache + 重载一次。localStorage 一根手指都不碰。
+  -->
+  <script>
+    (function () {
+      try {
+        var meta = document.querySelector('meta[name="build"]');
+        var build = meta ? meta.content : '';
+        if (!build) return;
+
+        var seen = localStorage.getItem('vocab.build');
+        localStorage.setItem('vocab.build', build);
+        if (seen === build) {
+          sessionStorage.removeItem('vocab.healing');
+          return;
+        }
+
+        // 只有在「已被 Service Worker 接管」时才自救；全新安装不需要
+        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+        if (sessionStorage.getItem('vocab.healing')) return; // 同一会话只试一次，防死循环
+        sessionStorage.setItem('vocab.healing', '1');
+
+        var jobs = [];
+        if (navigator.serviceWorker.getRegistrations) {
+          jobs.push(navigator.serviceWorker.getRegistrations().then(function (regs) {
+            return Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }));
+        }
+        if (window.caches && caches.keys) {
+          jobs.push(caches.keys().then(function (keys) {
+            return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }));
+        }
+        Promise.all(jobs).then(function () { location.reload(); }, function () { location.reload(); });
+      } catch (e) {
+        /* 无痕模式等场景写不进存储，忽略 */
+      }
+    })();
+  </script>
 </head>
 <body>
   <div id="app">

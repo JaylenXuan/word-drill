@@ -622,7 +622,13 @@ function registerServiceWorker() {
     showToast('已更新到新版，刷新后生效');
   });
 
-  nav.serviceWorker.register('sw.js').catch((err) => {
+  nav.serviceWorker.register('sw.js').then((reg) => {
+    // 浏览器对 sw.js 的自动复查有 24 小时上限，主动催一次，避免长期卡旧版
+    reg.update?.();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') reg.update?.();
+    });
+  }).catch((err) => {
     console.warn('[SW] 注册失败，联网照常可用', err);
   });
 }

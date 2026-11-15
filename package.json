@@ -1,7 +1,7 @@
 ﻿{
   "name": "word-drill",
   "private": true,
-  "version": "0.9.1",
+  "version": "0.9.2",
   "type": "module",
   "description": "个人背单词（雅思词汇真经）—— 零构建静态网页，数据只存本地",
   "scripts": {
@@ -16,6 +16,7 @@
     "build:deck": "node tools/import-ielts-bible.mjs && node tools/fix-deck.mjs && node tools/split-example-zh.mjs"
   }
 }
+
 
 
 
