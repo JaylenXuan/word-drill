@@ -2,7 +2,7 @@
  * 生成命令：node tools/build-sw.mjs
  * 版本号 = 预缓存清单里所有文件的 sha256 前 12 位，任何文件变化都会变。
  */
-const VERSION = 'wd-3461ccfa2cec';
+const VERSION = 'wd-dabd630a0a47';
 const SHELL = 'shell-' + VERSION;
 const RUNTIME = 'runtime-v1';
 const NETWORK_TIMEOUT = 3500;
@@ -66,7 +66,9 @@ async function fromNetwork(request) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), NETWORK_TIMEOUT);
   try {
-    return await fetch(request, { signal: ctrl.signal });
+    // no-store：绕过浏览器 HTTP 缓存。GitHub Pages 给 HTML 也发了 max-age=600，
+    // 不绕的话新版本最多要等 10 分钟才可见。
+    return await fetch(request, { signal: ctrl.signal, cache: 'no-store' });
   } finally {
     clearTimeout(timer);
   }

@@ -48,7 +48,9 @@ async function fromNetwork(request) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), NETWORK_TIMEOUT);
   try {
-    return await fetch(request, { signal: ctrl.signal });
+    // no-store：绕过浏览器 HTTP 缓存。GitHub Pages 给 HTML 也发了 max-age=600，
+    // 不绕的话新版本最多要等 10 分钟才可见。
+    return await fetch(request, { signal: ctrl.signal, cache: 'no-store' });
   } finally {
     clearTimeout(timer);
   }

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>背单词</title>
-  <meta name="build" content="0.9.2" />
+  <meta name="build" content="0.9.3" />
 
   <!-- 主屏安装：iOS 走 apple-* 这组，Android/桌面走 manifest -->
   <link rel="manifest" href="manifest.webmanifest" />
@@ -40,28 +40,40 @@
 
         var seen = localStorage.getItem('vocab.build');
         localStorage.setItem('vocab.build', build);
+
         if (seen === build) {
           sessionStorage.removeItem('vocab.healing');
           return;
         }
-
-        // 只有在「已被 Service Worker 接管」时才自救；全新安装不需要
-        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
-        if (sessionStorage.getItem('vocab.healing')) return; // 同一会话只试一次，防死循环
+        // 同一会话只自救一次，防止任何情况下重载死循环
+        if (sessionStorage.getItem('vocab.healing')) return;
         sessionStorage.setItem('vocab.healing', '1');
 
+        var sw = navigator.serviceWorker;
+        var hadRegistration = false;
         var jobs = [];
-        if (navigator.serviceWorker.getRegistrations) {
-          jobs.push(navigator.serviceWorker.getRegistrations().then(function (regs) {
+
+        if (sw && sw.getRegistrations) {
+          jobs.push(sw.getRegistrations().then(function (regs) {
+            hadRegistration = regs.length > 0;
             return Promise.all(regs.map(function (r) { return r.unregister(); }));
           }));
+        } else if (sw && sw.controller) {
+          hadRegistration = true; // 老浏览器没有 getRegistrations
         }
         if (window.caches && caches.keys) {
           jobs.push(caches.keys().then(function (keys) {
             return Promise.all(keys.map(function (k) { return caches.delete(k); }));
           }));
         }
-        Promise.all(jobs).then(function () { location.reload(); }, function () { location.reload(); });
+
+        Promise.all(jobs).then(function () {
+          if (hadRegistration) location.reload();
+          else sessionStorage.removeItem('vocab.healing'); // 全新安装，无需重载
+        }, function () {
+          if (hadRegistration) location.reload();
+          else sessionStorage.removeItem('vocab.healing');
+        });
       } catch (e) {
         /* 无痕模式等场景写不进存储，忽略 */
       }
