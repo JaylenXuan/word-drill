@@ -193,7 +193,7 @@ console.log('界面冒烟测试');
       customUsedToday: 3, customDailyLimit: 20,
     });
     if (!entryHtml.includes('记一个生词') || !entryHtml.includes('今天 3/20')) fail('生词录入页不对');
-    if (!entryHtml.includes('音标')) fail('录入页缺少可选音标');
+    if (entryHtml.includes('音标')) fail('生词录入页不该再有音标字段');
 
     const customApp = {
       custom: { version: 1, words: { 'my-x': { id: 'my-x', word: 'mitigate', meaning: '减轻' } } },
@@ -208,6 +208,13 @@ console.log('界面冒烟测试');
     });
     if (!svCustom.includes('生词')) fail('生词卡片没有「生词」标记');
     if (!svCustom.includes('mitigate')) fail('生词卡片取不到词条（wordOf 没生效）');
+    // 老数据里就算还留着音标，生词卡也不该显示
+    const s4 = buildSession('review', ['my-y']);
+    const svPhonetic = sessionView({
+      session: s4, wordMap, flipped: false, lastGap: null,
+      wordOf: () => ({ word: 'abatement', meaning: '减少', phonetic: '/əˈbeɪt.mənt/' }),
+    });
+    if (svPhonetic.includes('əˈbeɪt')) fail('生词卡仍然显示了音标');
 
     if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 / 生词录入 / 生词本 都能渲染，界面无署名');
   } catch (e) {

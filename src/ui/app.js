@@ -66,7 +66,7 @@ const app = {
   sound: createSound({ enabled: loadPrefs().sound }),
   persistState: null,
   custom: { version: 1, words: {} },
-  customDraft: { id: null, word: '', meaning: '', phonetic: '' },
+  customDraft: { id: null, word: '', meaning: '' },
   customUsedToday: 0,
   customDailyLimit: 20,
   /** 统一取词：雅思词库或生词本 */
@@ -255,8 +255,8 @@ function checkCustomWord(word, editingId = null) {
 function openCustomEntry(id = null) {
   const e = id ? app.custom.words[id] : null;
   app.customDraft = e
-    ? { id: e.id, word: e.word, meaning: e.meaning, phonetic: e.phonetic || '' }
-    : { id: null, word: '', meaning: '', phonetic: '' };
+    ? { id: e.id, word: e.word, meaning: e.meaning }
+    : { id: null, word: '', meaning: '' };
   app.screen = 'custom-entry';
   render();
   setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
@@ -265,11 +265,9 @@ function openCustomEntry(id = null) {
 function saveCustomEntry() {
   const wordEl = document.getElementById('cw-word');
   const meanEl = document.getElementById('cw-meaning');
-  const phonEl = document.getElementById('cw-phonetic');
   const check = validateEntry({ word: wordEl?.value, meaning: meanEl?.value });
   if (!check.ok) { showToast(check.error); wordEl?.focus(); return; }
 
-  const phonetic = (phonEl?.value || '').trim();
   const today = todayKey();
   const editingId = app.customDraft?.id || null;
   const gate = checkCustomWord(check.word, editingId);
@@ -285,7 +283,7 @@ function saveCustomEntry() {
     const id = makeCustomId();
     const now = new Date().toISOString();
     app.custom.words[id] = {
-      id, word: check.word, meaning: check.meaning, phonetic, createdAt: now, updatedAt: null,
+      id, word: check.word, meaning: check.meaning, createdAt: now, updatedAt: null,
     };
     app.storage.saveCustom(app.custom);
 
@@ -299,7 +297,7 @@ function saveCustomEntry() {
     app.state.daily[today].customAdded = (Number(app.state.daily[today].customAdded) || 0) + 1;
     app.storage.save(app.state);
 
-    app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+    app.customDraft = { id: null, word: '', meaning: '' };
     render();
     setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
     showToast('已加入今日复习');
@@ -310,10 +308,9 @@ function saveCustomEntry() {
   if (!entry) { showToast('这条记录不见了'); app.screen = 'custom-list'; render(); return; }
   entry.word = check.word;
   entry.meaning = check.meaning;
-  entry.phonetic = phonetic;
   entry.updatedAt = new Date().toISOString();
   app.storage.saveCustom(app.custom);
-  app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+  app.customDraft = { id: null, word: '', meaning: '' };
   app.screen = 'custom-list';
   render();
   showToast('已保存');
@@ -592,7 +589,7 @@ root.addEventListener('click', async (e) => {
       render();
       break;
     case 'close-custom':
-      app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+      app.customDraft = { id: null, word: '', meaning: '' };
       app.screen = 'home';
       app.tab = app.tab === 'settings' ? 'settings' : 'today';
       render();
@@ -753,9 +750,9 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const id = e.target?.id;
       if (id === 'cw-word') { e.preventDefault(); document.getElementById('cw-meaning')?.focus(); }
-      else if (id === 'cw-meaning' || id === 'cw-phonetic') { e.preventDefault(); saveCustomEntry(); }
+      else if (id === 'cw-meaning') { e.preventDefault(); saveCustomEntry(); }
     } else if (e.key === 'Escape') {
-      app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+      app.customDraft = { id: null, word: '', meaning: '' };
       app.screen = 'home';
       render();
     }

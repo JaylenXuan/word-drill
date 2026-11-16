@@ -1,8 +1,8 @@
-// 生词录入页：三个字段，两个必填，保存后原地继续录
+// 生词录入页：只有单词 + 释义两个输入框，保存后原地继续录
 import { esc } from '../dom.js';
 
 export function customEntryView(app) {
-  const d = app.customDraft || { id: null, word: '', meaning: '', phonetic: '' };
+  const d = app.customDraft || { id: null, word: '', meaning: '' };
   const editing = !!d.id;
   const used = app.customUsedToday || 0;
   const limit = app.customDailyLimit || 20;
@@ -18,22 +18,16 @@ export function customEntryView(app) {
 
     <div class="form">
       <label class="form-field">
-        <span class="form-label">单词 / 短语 <em>必填</em></span>
+        <span class="form-label">单词 / 短语</span>
         <input id="cw-word" class="form-input" type="text" autocomplete="off" autocapitalize="off"
           autocorrect="off" spellcheck="false" enterkeyhint="next"
           value="${esc(d.word)}" placeholder="比如 mitigate" ${editing ? '' : 'autofocus'} />
       </label>
 
       <label class="form-field">
-        <span class="form-label">释义 <em>必填</em></span>
+        <span class="form-label">释义</span>
         <input id="cw-meaning" class="form-input" type="text" autocomplete="off"
           enterkeyhint="done" value="${esc(d.meaning)}" placeholder="比如 减轻；缓解" />
-      </label>
-
-      <label class="form-field">
-        <span class="form-label">音标 <em>可选</em></span>
-        <input id="cw-phonetic" class="form-input" type="text" autocomplete="off" autocapitalize="off"
-          spellcheck="false" enterkeyhint="done" value="${esc(d.phonetic)}" placeholder="比如 /ˈmɪt.ɪ.ɡeɪt/" />
       </label>
     </div>
 

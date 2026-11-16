@@ -36,7 +36,7 @@ export function sessionView(app) {
           <span class="mode-chip ${inRetry ? 'is-retry' : ''}">${chip}</span>
           <div class="face-inner">
             <div class="word ${sizeClass}">${esc(w.word)}</div>
-            ${w.phonetic ? `<div class="phonetic">${esc(w.phonetic)}</div>` : ''}
+            ${!fromCustom && w.phonetic ? `<div class="phonetic">${esc(w.phonetic)}</div>` : ''}
             <button class="speak" data-action="speak" aria-label="发音">🔊</button>
             <div class="tip">${inRetry ? '再看一眼，这次记住了吗' : '轻点卡片看释义'}</div>
           </div>
