@@ -23,6 +23,8 @@ export const PRECACHE = [
   'src/ui/dom.js',
   'src/ui/prefs.js',
   'src/ui/sound.js',
+  'src/ui/views/custom-entry.js',
+  'src/ui/views/custom-list.js',
   'src/ui/views/done.js',
   'src/ui/views/home.js',
   'src/ui/views/mistakes.js',
@@ -32,6 +34,7 @@ export const PRECACHE = [
   'src/ui/views/settings.js',
   'src/ui/views/stats.js',
   'src/core/audit.js',
+  'src/core/custom.js',
   'src/core/dates.js',
   'src/core/queue.js',
   'src/core/review.js',
@@ -59,4 +62,5 @@ export function computeVersion() {
   }
   return `wd-${h.digest('hex').slice(0, 12)}`;
 }
+
 

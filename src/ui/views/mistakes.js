@@ -19,7 +19,7 @@ export function mistakesView(ctx) {
 
   const rows = ids.slice(0, 200).map((id) => {
     const card = ctx.state.cards[id];
-    const w = ctx.wordMap.get(id) || { word: id, meaning: '' };
+    const w = (ctx.wordOf ? ctx.wordOf(id) : ctx.wordMap.get(id)) || { word: id, meaning: '' };
     const gap = card.due > today ? null : '已到期';
     return `
     <li class="list-row">

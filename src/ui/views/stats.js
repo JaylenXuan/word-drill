@@ -30,6 +30,15 @@ export function statsView(ctx) {
       <div class="stat-box"><b>${ctx.streak}</b><span>连续天数</span></div>
       <div class="stat-box"><b>${ctx.best}</b><span>最长连续</span></div>
     </section>
+    <p class="split-line">复习拆分：雅思 ${Math.max(0, ctx.entry.reviewsDone - ctx.customReviewsToday)} · 生词 ${ctx.customReviewsToday}</p>
+
+    <section class="card">
+      <h2>生词本</h2>
+      <div class="kv"><span>已录</span><span>${ctx.customCount} 个</span></div>
+      <div class="kv"><span>今日录入</span><span>${ctx.customAddedToday}/${ctx.customDailyLimit}</span></div>
+      <div class="kv"><span>今日生词复习</span><span>${ctx.customReviewsToday}</span></div>
+      <div class="kv"><span>今天待复习</span><span>${ctx.customDue}</span></div>
+    </section>
 
     <section class="card">
       <h2>词库进度</h2>

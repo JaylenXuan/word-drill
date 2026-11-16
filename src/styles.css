@@ -225,6 +225,7 @@ button { font-family: inherit; cursor: pointer; }
 .primary:active:not(:disabled) { transform: scale(var(--press)); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset; }
 .primary.ghost { background: var(--bg-elev); color: var(--text-muted); border: 1px solid var(--line); box-shadow: none; }
 .primary.ghost:active:not(:disabled) { transform: none; }
+.primary:disabled { opacity: 0.45; box-shadow: none; }
 
 .link {
   min-height: 44px;
@@ -783,6 +784,85 @@ body:has(.tabbar) .page { padding-bottom: calc(var(--tabbar-h) + 24px); }
 
 .loading-view { text-align: center; padding-top: calc(96px + env(safe-area-inset-top)); }
 .loading-view .brand { margin-top: 4px; }
+
+/* ---------- 生词录入 / 生词本 ---------- */
+
+.add-btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--accent-text);
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+.add-btn:active { transform: scale(0.96); }
+
+.nudge-sub {
+  display: block;
+  margin: 8px auto 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.split-line { text-align: center; color: var(--text-muted); font-size: 12px; margin: 8px 0 0; }
+
+.entry-page { padding-top: calc(12px + env(safe-area-inset-top)); }
+.entry-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 18px;
+}
+.entry-title { flex: 1; font-size: 17px; font-weight: 600; }
+.entry-count { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; color: var(--text-muted); letter-spacing: 0.02em; }
+.form-label em { font-style: normal; opacity: 0.6; margin-left: 4px; }
+.form-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 17px; /* ≥16px 防止 iOS 自动放大 */
+  font-family: inherit;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--cta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cta) 18%, transparent);
+}
+
+.form-hint { min-height: 18px; margin: 12px 2px 0; font-size: 13px; line-height: 1.5; }
+.form-hint.warn { color: var(--warn-ink); }
+.form-hint.bad { color: var(--bad-ink); }
+
+.row-actions { display: flex; gap: 6px; align-self: center; flex: none; }
+.due-tag { font-size: 11px; font-weight: 400; color: var(--text-muted); margin-left: 6px; }
+.mini {
+  min-height: 32px;
+  min-width: 40px;
+  padding: 4px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.mini.danger { color: var(--bad-ink); border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
 
 /* ---------- 提示 ---------- */
 

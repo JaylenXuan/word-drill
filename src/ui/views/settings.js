@@ -49,6 +49,16 @@ export function settingsView(app, ctx) {
     </header>
 
     <section class="card">
+      <h2>生词本</h2>
+      <div class="kv"><span>已录</span><span>${ctx.customCount} 个 · 今天待复习 ${ctx.customDue}</span></div>
+      <div class="kv"><span>今日录入</span><span>${ctx.customAddedToday}/${ctx.customDailyLimit}</span></div>
+      <div class="actions">
+        <button class="primary" data-action="open-custom">＋ 记一个生词</button>
+        <button class="link" data-action="open-custom-list">查看 / 编辑</button>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>偏好</h2>
       <div class="pref-row">
         <div class="pref-text">
@@ -121,7 +131,7 @@ export function settingsView(app, ctx) {
 
     <section class="card">
       <h2>关于</h2>
-      <div class="kv"><span>版本</span><span>0.9.3</span></div>
+      <div class="kv"><span>版本</span><span>0.10.0</span></div>
       <div class="kv"><span>词库</span><span>雅思词汇真经 ${ctx.total} 词</span></div>
       <div class="kv"><span>来源</span><span>github.com/hefengxian/my-ielts</span></div>
       <div class="kv"><span>协议</span><span>原仓库未声明 LICENSE，仅个人学习用</span></div>
@@ -131,6 +141,7 @@ export function settingsView(app, ctx) {
     </section>
   </div>`;
 }
+
 
 
 

@@ -31,7 +31,11 @@ export function applyGrade(state, grade, wordId, today = todayKey(), now = new D
   }
   const entry = state.daily[today];
   if (wasNew) entry.newLearned += 1;
-  else entry.reviewsDone += 1;
+  else {
+    entry.reviewsDone += 1;
+    // 生词的评分单独记一笔，统计页才能分组显示
+    if (String(wordId).startsWith('my-')) entry.customReviews = (Number(entry.customReviews) || 0) + 1;
+  }
 
   return { card: next, log, requeue, wasNew };
 }

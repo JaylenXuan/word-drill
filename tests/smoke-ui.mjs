@@ -1,4 +1,4 @@
-﻿// 界面冒烟测试：node tests/smoke-ui.mjs
+// 界面冒烟测试：node tests/smoke-ui.mjs
 // 用极简 DOM 桩把 src/ui/app.js 真正跑起来，专抓「白屏」类错误：
 // 导入不存在的函数、运行时拼错变量、词库路径写错、渲染 undefined。
 // 两个场景：首次打开（引导页）、已有进度（首页）。1 秒内出结果。
@@ -133,6 +133,8 @@ console.log('界面冒烟测试');
     entry: { newLearned: 3, reviewsDone: 5, goalNew: 10 },
     due: [], newIds: ['ielts0004'], streak: 5, best: 7, tomorrow: 2,
     total: 3632, learned: 3, newLeftInDeck: 3629, reviewTotal: 42,
+    goalNew: 10, customCount: 2, customDue: 1, customAddedToday: 1, customDailyLimit: 20,
+    wordOf: (id) => wordMap.get(id) || null,
   };
 
   try {
@@ -155,6 +157,7 @@ console.log('界面冒烟测试');
     if (!cfg.includes('21 天前')) fail('设置页没有正确显示备份天数');
     if (!cfg.includes('主屏 App') && !cfg.includes('Safari 标签页')) fail('设置页没有显示运行环境');
     if (!cfg.includes('已授予')) fail('设置页没有显示持久化存储状态');
+    if (!cfg.includes('记一个生词')) fail('设置页缺少生词本入口');
     if (!cfg.includes('快捷指令')) fail('设置页缺少「怎么被叫来」的说明');
     // 鲸鱼娘只能出现在完成页/空状态，且署名不许进界面
     if (cfg.includes('上善无形') || cfg.includes('CC BY-NC')) fail('设置页里出现了署名，应该只在 README');
@@ -181,7 +184,32 @@ console.log('界面冒烟测试');
     const sv = sessionView({ session: s2, wordMap, flipped: false, lastGap: null });
     if (!sv.includes('补考')) fail('补考阶段的卡片没标「补考」');
     if (!sv.includes('补考 1/3')) fail('补考计数没显示');
-    if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 都能渲染，文案分档正确，界面无署名');
+
+    // 生词：录入页、生词本列表、复习卡上的「生词」标记
+    const { customEntryView } = await import('../src/ui/views/custom-entry.js');
+    const { customListView } = await import('../src/ui/views/custom-list.js');
+    const entryHtml = customEntryView({
+      customDraft: { id: null, word: '', meaning: '', phonetic: '' },
+      customUsedToday: 3, customDailyLimit: 20,
+    });
+    if (!entryHtml.includes('记一个生词') || !entryHtml.includes('今天 3/20')) fail('生词录入页不对');
+    if (!entryHtml.includes('音标')) fail('录入页缺少可选音标');
+
+    const customApp = {
+      custom: { version: 1, words: { 'my-x': { id: 'my-x', word: 'mitigate', meaning: '减轻' } } },
+    };
+    const listHtml = customListView(customApp, ctx);
+    if (!listHtml.includes('mitigate') || !listHtml.includes('生词本')) fail('生词本列表不对');
+
+    const s3 = buildSession('review', ['my-x']);
+    const svCustom = sessionView({
+      session: s3, wordMap, flipped: false, lastGap: null,
+      wordOf: (id) => ({ 'my-x': { word: 'mitigate', meaning: '减轻' } }[id] || wordMap.get(id)),
+    });
+    if (!svCustom.includes('生词')) fail('生词卡片没有「生词」标记');
+    if (!svCustom.includes('mitigate')) fail('生词卡片取不到词条（wordOf 没生效）');
+
+    if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 / 生词录入 / 生词本 都能渲染，界面无署名');
   } catch (e) {
     fail(`Stage 3 页面渲染报错：${e.message}`);
   }

@@ -7,6 +7,11 @@ import { computeStreak } from '../core/stats.js';
 import { todayKey, addDays } from '../core/dates.js';
 import { applyGrade } from '../core/review.js';
 import { buildSession, currentItem, gradeSession, isFinished } from '../core/session.js';
+import { createCard } from '../core/scheduler.js';
+import {
+  CUSTOM_DECK_ID, dailyLimit, makeCustomId, validateEntry, findByWord,
+  findSuffixSibling, normalizeWord,
+} from '../core/custom.js';
 import { homeView } from './views/home.js';
 import { onboardView } from './views/onboard.js';
 import { sessionView } from './views/session.js';
@@ -15,6 +20,8 @@ import { reviewView } from './views/review.js';
 import { mistakesView } from './views/mistakes.js';
 import { statsView } from './views/stats.js';
 import { settingsView } from './views/settings.js';
+import { customEntryView } from './views/custom-entry.js';
+import { customListView } from './views/custom-list.js';
 import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from './prefs.js';
 import { createSound } from './sound.js';
 import { esc } from './dom.js';
@@ -58,6 +65,14 @@ const app = {
   prefs: loadPrefs(),
   sound: createSound({ enabled: loadPrefs().sound }),
   persistState: null,
+  custom: { version: 1, words: {} },
+  customDraft: { id: null, word: '', meaning: '', phonetic: '' },
+  customUsedToday: 0,
+  customDailyLimit: 20,
+  /** 统一取词：雅思词库或生词本 */
+  wordOf(id) {
+    return app.wordMap.get(id) || app.custom?.words?.[id] || null;
+  },
 };
 
 // 评分有一次 260ms 的收尾动画，期间禁止重复评分
@@ -109,6 +124,14 @@ function context() {
       })
       .map((w) => w.id)
     : [];
+
+  // 生词本
+  const customList = Object.values(app.custom?.words || {});
+  const customDue = customList.filter((e) => {
+    const c = app.state.cards[e.id];
+    return c && c.state !== 'new' && c.due <= today;
+  }).length;
+
   return {
     today,
     deck,
@@ -123,7 +146,13 @@ function context() {
     newLeftInDeck,
     goalNew,
     extraIds,
+    customCount: customList.length,
+    customDue,
+    customAddedToday: Number(entry.customAdded) || 0,
+    customReviewsToday: Number(entry.customReviews) || 0,
+    customDailyLimit: dailyLimit(cfg),
     wordMap: app.wordMap,
+    wordOf: (id) => app.wordOf(id),
     reviewTotal: app.reviewTotal,
     // 备份提醒：从没导出过就看学了多少词，导出过就看隔了多久
     backupDays: backupDays ?? 0,
@@ -152,10 +181,15 @@ function render() {
 
   let body;
   let showTabs = true;
+  app.customUsedToday = ctx.customAddedToday;
+  app.customDailyLimit = ctx.customDailyLimit;
+
   if (app.screen === 'loading') { body = loadingView(); showTabs = false; }
   else if (app.screen === 'onboard') { body = onboardView(app); showTabs = false; }
   else if (app.screen === 'session') { body = sessionView(app); showTabs = false; }
   else if (app.screen === 'done') { body = doneView(app, ctx); showTabs = false; }
+  else if (app.screen === 'custom-entry') { body = customEntryView(app); showTabs = false; }
+  else if (app.screen === 'custom-list') { body = customListView(app, ctx); showTabs = false; }
   else if (app.tab === 'today') body = homeView(ctx, app);
   else if (app.tab === 'review') body = reviewView(ctx);
   else if (app.tab === 'mistakes') body = mistakesView(ctx);
@@ -183,6 +217,142 @@ function loadingView() {
 
 function setGradesEnabled(on) {
   root.querySelectorAll?.('.grade').forEach((b) => { b.disabled = !on; });
+}
+
+// ---------- 生词本 ----------
+
+/** 在雅思词库里找同一个词（含 "favour / favor" 这种多拼写条目） */
+function findInDeck(deck, word) {
+  const key = normalizeWord(word);
+  if (!deck || !key) return null;
+  for (const w of deck.words) {
+    const parts = String(w.word).split('/').map((s) => normalizeWord(s));
+    if (parts.includes(key)) return w;
+  }
+  return null;
+}
+
+/** 判断当前输入会不会撞车，供实时提示与保存时复用 */
+function checkCustomWord(word, editingId = null) {
+  const probe = validateEntry({ word, meaning: 'x' });
+  if (!probe.ok) return { block: true, kind: 'bad', text: probe.error };
+
+  const dup = findByWord(app.custom, word);
+  if (dup && dup.id !== editingId) {
+    return { block: false, kind: 'warn', dup, text: `「${dup.word}」已经在生词本里，保存会打开它让你改` };
+  }
+  const deckHit = findInDeck(app.deck, word);
+  if (deckHit) {
+    return { block: true, kind: 'bad', text: `「${deckHit.word}」已在雅思词库，不用重复建卡` };
+  }
+  const sib = findSuffixSibling(app.custom, word);
+  if (sib) {
+    return { block: false, kind: 'warn', text: `生词本里已经有「${sib.word}」，可能只是词形变化（仍可新建）` };
+  }
+  return { block: false, kind: '', text: '' };
+}
+
+function openCustomEntry(id = null) {
+  const e = id ? app.custom.words[id] : null;
+  app.customDraft = e
+    ? { id: e.id, word: e.word, meaning: e.meaning, phonetic: e.phonetic || '' }
+    : { id: null, word: '', meaning: '', phonetic: '' };
+  app.screen = 'custom-entry';
+  render();
+  setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
+}
+
+function saveCustomEntry() {
+  const wordEl = document.getElementById('cw-word');
+  const meanEl = document.getElementById('cw-meaning');
+  const phonEl = document.getElementById('cw-phonetic');
+  const check = validateEntry({ word: wordEl?.value, meaning: meanEl?.value });
+  if (!check.ok) { showToast(check.error); wordEl?.focus(); return; }
+
+  const phonetic = (phonEl?.value || '').trim();
+  const today = todayKey();
+  const editingId = app.customDraft?.id || null;
+  const gate = checkCustomWord(check.word, editingId);
+
+  if (gate.block) { showToast(gate.text); return; }
+  if (gate.dup) { openCustomEntry(gate.dup.id); return; }
+
+  if (!editingId) {
+    const used = Number(app.state.daily[today]?.customAdded) || 0;
+    const limit = dailyLimit(app.state.config);
+    if (used >= limit) { showToast(`今天已经录了 ${limit} 个，明天再录`); return; }
+
+    const id = makeCustomId();
+    const now = new Date().toISOString();
+    app.custom.words[id] = {
+      id, word: check.word, meaning: check.meaning, phonetic, createdAt: now, updatedAt: null,
+    };
+    app.storage.saveCustom(app.custom);
+
+    // 直接建成「已到期」的卡：立刻进今日复习，但不吃新词名额
+    const card = createCard(id, CUSTOM_DECK_ID, today);
+    app.state.cards[id] = { ...card, state: 'review', due: today, interval: 0 };
+    const ctxNow = app.ctx || context();
+    if (!app.state.daily[today]) {
+      app.state.daily[today] = { newLearned: 0, reviewsDone: 0, goalNew: ctxNow.goalNew, customAdded: 0 };
+    }
+    app.state.daily[today].customAdded = (Number(app.state.daily[today].customAdded) || 0) + 1;
+    app.storage.save(app.state);
+
+    app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+    render();
+    setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
+    showToast('已加入今日复习');
+    return;
+  }
+
+  const entry = app.custom.words[editingId];
+  if (!entry) { showToast('这条记录不见了'); app.screen = 'custom-list'; render(); return; }
+  entry.word = check.word;
+  entry.meaning = check.meaning;
+  entry.phonetic = phonetic;
+  entry.updatedAt = new Date().toISOString();
+  app.storage.saveCustom(app.custom);
+  app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+  app.screen = 'custom-list';
+  render();
+  showToast('已保存');
+}
+
+function deleteCustomEntry(id) {
+  const entry = app.custom.words[id];
+  if (!entry) return;
+  const ok = typeof confirm === 'function'
+    ? confirm(`删除「${entry.word}」？它的学习进度也会一起删掉。`)
+    : true;
+  if (!ok) return;
+
+  delete app.custom.words[id];
+  app.storage.saveCustom(app.custom);
+  delete app.state.cards[id];
+
+  // 今天录的删掉要返还名额
+  const today = todayKey();
+  const daily = app.state.daily[today];
+  const addedToday = String(entry.createdAt || '').slice(0, 10) === today;
+  if (daily && addedToday && Number(daily.customAdded) > 0) {
+    daily.customAdded = Number(daily.customAdded) - 1;
+  }
+  app.storage.save(app.state);
+  render();
+  showToast('已删除');
+}
+
+/** 输入时的实时提示（不重渲染，避免丢焦点） */
+function refreshCustomHint() {
+  const word = document.getElementById('cw-word')?.value || '';
+  const hint = document.getElementById('cw-hint');
+  const save = document.getElementById('cw-save');
+  if (!hint) return;
+  const gate = checkCustomWord(word, app.customDraft?.id || null);
+  hint.textContent = gate.text;
+  hint.className = `form-hint ${gate.kind || ''}`;
+  if (save && !save.dataset.locked) save.disabled = gate.block;
 }
 
 // ---------- 会话 ----------
@@ -412,6 +582,33 @@ root.addEventListener('click', async (e) => {
       forceReload();
       break;
     }
+    case 'open-custom':
+    case 'new-custom':
+      openCustomEntry(null);
+      break;
+    case 'open-custom-list':
+      flushLogs();
+      app.screen = 'custom-list';
+      render();
+      break;
+    case 'close-custom':
+      app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+      app.screen = 'home';
+      app.tab = app.tab === 'settings' ? 'settings' : 'today';
+      render();
+      break;
+    case 'save-custom':
+      saveCustomEntry();
+      break;
+    case 'edit-custom':
+      openCustomEntry(el.dataset.id);
+      break;
+    case 'delete-custom':
+      deleteCustomEntry(el.dataset.id);
+      break;
+    case 'cancel-edit-custom':
+      openCustomEntry(null);
+      break;
     case 'toggle-sound': {
       app.prefs.sound = !app.prefs.sound;
       savePrefs(app.prefs);
@@ -474,6 +671,7 @@ function importFromBox() {
   try {
     const { warnings } = app.storage.importJSON(text);
     app.state = app.storage.load().state;
+    app.custom = app.storage.loadCustom();
     app.reviewTotal = app.storage.getReviews().length;
     app.tab = 'today';
     app.screen = 'home';
@@ -490,8 +688,15 @@ function resetProgress() {
     showToast('请先输入「重置」两个字');
     return;
   }
+  // 第二次确认：生词本也会一起清空
+  const ok = typeof confirm === 'function'
+    ? confirm('会连生词本一起清空（包括你手动录的词），不可撤销。确定重置？')
+    : true;
+  if (!ok) return;
+
   app.storage.reset();
   app.state = app.storage.load().state;
+  app.custom = app.storage.loadCustom();
   app.reviewTotal = 0;
   app.pendingLogs = [];
   app.tab = 'today';
@@ -536,7 +741,26 @@ async function requestPersistence() {
   }
 }
 
+// 生词录入页：输入时实时提示，不重渲染（否则会丢焦点）
+root.addEventListener('input', (e) => {
+  if (app.screen !== 'custom-entry') return;
+  const id = e.target?.id;
+  if (id === 'cw-word') refreshCustomHint();
+});
+
 document.addEventListener('keydown', (e) => {
+  if (app.screen === 'custom-entry') {
+    if (e.key === 'Enter') {
+      const id = e.target?.id;
+      if (id === 'cw-word') { e.preventDefault(); document.getElementById('cw-meaning')?.focus(); }
+      else if (id === 'cw-meaning' || id === 'cw-phonetic') { e.preventDefault(); saveCustomEntry(); }
+    } else if (e.key === 'Escape') {
+      app.customDraft = { id: null, word: '', meaning: '', phonetic: '' };
+      app.screen = 'home';
+      render();
+    }
+    return;
+  }
   if (app.screen !== 'session') return;
   if (e.code === 'Space') {
     e.preventDefault();
@@ -576,6 +800,7 @@ async function boot() {
   app.storage = createStorage(localAdapter());
   const { state, warnings } = app.storage.load();
   app.state = state;
+  app.custom = app.storage.loadCustom();
   app.prefs = loadPrefs();
   app.sound.setEnabled(app.prefs.sound);
   app.reviewTotal = app.storage.getReviews().length;

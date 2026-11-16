@@ -926,6 +926,86 @@ group('离线能力（Service Worker）');
   });
 }
 
+// ---------- 生词本 ----------
+group('生词本（自定义词）');
+{
+  const C = await import('../src/core/custom.js');
+
+  test('归一化：大小写、全角、多余空格、首尾标点都不影响判重', () => {
+    assert.equal(C.normalizeWord('  Mitigate '), 'mitigate');
+    assert.equal(C.normalizeWord('ｍｉｔｉｇａｔｅ'), 'mitigate');
+    assert.equal(C.normalizeWord('look   forward  to'), 'look forward to');
+    assert.equal(C.normalizeWord('"mitigate."'), 'mitigate');
+  });
+  test('校验：必填、长度、短语词数', () => {
+    assert.equal(C.validateEntry({ word: '', meaning: 'x' }).ok, false);
+    assert.equal(C.validateEntry({ word: 'abc', meaning: '  ' }).ok, false);
+    assert.equal(C.validateEntry({ word: 'a'.repeat(61), meaning: 'x' }).ok, false);
+    assert.equal(C.validateEntry({ word: 'one two three four five six seven', meaning: 'x' }).ok, false);
+    assert.equal(C.validateEntry({ word: 'mitigate', meaning: '减轻' }).ok, true);
+    assert.equal(C.validateEntry({ word: '  give   up ', meaning: ' 放弃 ' }).word, 'give up');
+  });
+  test('wordId 带 my- 前缀且不重复', () => {
+    const ids = new Set();
+    for (let i = 0; i < 200; i += 1) ids.add(C.makeCustomId(1700000000000 + i, Math.random));
+    assert.equal(ids.size, 200);
+    assert.ok([...ids].every((id) => C.isCustomId(id)));
+  });
+  test('重复查找与词尾近似', () => {
+    const store = C.normalizeStore({
+      words: {
+        'my-a': { id: 'my-a', word: 'Mitigate', meaning: '减轻' },
+        'my-b': { id: 'my-b', word: 'analyse', meaning: '分析' },
+      },
+    });
+    assert.equal(C.findByWord(store, 'mitigate').id, 'my-a');
+    assert.equal(C.findByWord(store, 'MITIGATE  ').id, 'my-a');
+    assert.equal(C.findByWord(store, 'nope'), null);
+    assert.equal(C.findSuffixSibling(store, 'analysed').id, 'my-b');
+    assert.equal(C.findSuffixSibling(store, 'mitigated').id, 'my-a');
+    assert.equal(C.findSuffixSibling(store, 'mitigate'), null);
+  });
+  test('生词建卡后立刻进复习队列，但不算新词', () => {
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const id = C.makeCustomId(1700000000000, () => 0.5);
+    st.cards[id] = { ...createCard(id, C.CUSTOM_DECK_ID, T0), state: 'review', due: T0, interval: 0 };
+
+    assert.deepEqual(buildReviewQueue(st.cards, T0), [id], '应该立刻出现在今日复习');
+    assert.equal(buildNewQueue([], st.cards, st.config, st.daily, T0).length, 0);
+
+    applyGrade(st, 'good', id, T0, new Date(`${T0}T20:00:00`), { goalNew: 10 });
+    assert.equal(st.daily[T0].newLearned, 0, '不吃新词名额');
+    assert.equal(st.daily[T0].reviewsDone, 1);
+    assert.equal(st.daily[T0].customReviews, 1, '生词复习单独计数');
+    assert.equal(st.cards[id].due, addDays(T0, 1), '调度和普通词一致');
+    assert.equal(st.cards[id].interval, 1);
+  });
+  test('导出/导入会把生词本一起带走；旧备份没有这个字段也不报错', () => {
+    const s = createStorage(memoryAdapter());
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    st.cards['my-x'] = { ...createCard('my-x', C.CUSTOM_DECK_ID, T0), state: 'review', due: T0 };
+    s.save(st);
+    s.saveCustom({ version: 1, words: { 'my-x': { id: 'my-x', word: 'mitigate', meaning: '减轻', phonetic: '/m/', createdAt: `${T0}T10:00:00Z` } } });
+
+    const text = s.exportJSON();
+    const other = createStorage(memoryAdapter());
+    other.importJSON(text);
+    assert.equal(other.loadCustom().words['my-x'].word, 'mitigate');
+
+    const legacy = JSON.stringify({ app: 'word-drill', exportVersion: 1, state: st, reviews: [] });
+    const s2 = createStorage(memoryAdapter());
+    assert.doesNotThrow(() => s2.importJSON(legacy));
+    assert.deepEqual(Object.keys(s2.loadCustom().words), []);
+  });
+  test('重置会连生词本一起清空', () => {
+    const s = createStorage(memoryAdapter());
+    s.save(createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10, onboarded: true }));
+    s.saveCustom({ version: 1, words: { 'my-x': { id: 'my-x', word: 'mitigate', meaning: '减轻' } } });
+    s.reset();
+    assert.deepEqual(Object.keys(s.loadCustom().words), []);
+  });
+}
+
 // ---------- 90 天模拟 ----------
 group('90 天模拟（算法在真实时间轴上的行为）');
 const DAYS = 90;

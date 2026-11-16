@@ -34,6 +34,7 @@ export function homeView(ctx) {
       <div class="sub">${ctx.streak > 0 ? `连续 ${ctx.streak} 天${ctx.best > ctx.streak ? ` · 最长 ${ctx.best} 天` : ''}` : '今天从第一个词开始'}</div>
     </div>
     <div class="streak-badge ${ctx.streak > 0 ? 'on' : 'go'}">${ctx.streak > 0 ? `🔥 ${ctx.streak}` : 'Start Now!'}</div>
+    <button class="add-btn" data-action="open-custom" aria-label="记一个生词">＋</button>
   </header>
 
   <div class="dual">
@@ -64,6 +65,9 @@ export function homeView(ctx) {
   </section>
 
   <p class="deck-line">词库：${esc(ctx.deck?.name || '未选择')}</p>
+  ${ctx.customCount > 0 ? `<button class="link nudge-sub" data-action="open-custom-list">
+    生词 ${ctx.customCount} 个${ctx.customDue ? ` · 今天待复习 ${ctx.customDue}` : ''}
+  </button>` : ''}
   ${ctx.backupOverdue ? `<button class="link nudge" data-action="tab" data-tab="settings">
     ${ctx.backupNever ? `还没导出过备份` : `备份已 ${ctx.backupDays} 天没做`} · 去设置里导出
   </button>` : ''}

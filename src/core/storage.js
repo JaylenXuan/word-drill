@@ -3,6 +3,7 @@
 // 通过 adapter 注入存储介质：浏览器用 localStorage，Node 单测用内存实现。
 
 import { todayKey } from './dates.js';
+import { CUSTOM_KEY, emptyStore, normalizeStore } from './custom.js';
 
 export const SCHEMA_VERSION = 1;
 export const STATE_KEY = 'vocab.v1/state';
@@ -139,11 +140,26 @@ export function createStorage(adapter) {
       }
     },
 
+    /** 生词本：独立 key，只在增删改时写 */
+    loadCustom() {
+      try {
+        const raw = adapter.getItem(CUSTOM_KEY);
+        return raw ? normalizeStore(JSON.parse(raw)) : emptyStore();
+      } catch {
+        return emptyStore();
+      }
+    },
+
+    saveCustom(custom) {
+      adapter.setItem(CUSTOM_KEY, JSON.stringify(custom));
+    },
+
     /** 导出成可复制的文本（iOS 上是唯一的备份手段） */
     exportJSON() {
       const { state, reviews } = api.load();
+      const custom = api.loadCustom();
       return JSON.stringify(
-        { app: 'word-drill', exportVersion: 1, exportedAt: new Date().toISOString(), state, reviews },
+        { app: 'word-drill', exportVersion: 1, exportedAt: new Date().toISOString(), state, reviews, custom },
         null,
         2,
       );
@@ -162,12 +178,14 @@ export function createStorage(adapter) {
       }
       const { state, warnings } = normalizeState(parsed.state);
       const reviews = Array.isArray(parsed.reviews) ? parsed.reviews : [];
+      const custom = normalizeStore(parsed.custom);
       api.save(state);
       adapter.setItem(REVIEWS_KEY, JSON.stringify(reviews));
-      return { state, reviews, warnings };
+      adapter.setItem(CUSTOM_KEY, JSON.stringify(custom));
+      return { state, reviews, custom, warnings };
     },
 
-    /** 清空全部进度（保留每日新词数、词库、引导状态） */
+    /** 清空全部进度（保留每日新词数、词库、引导状态）；生词本一并清空 */
     reset() {
       const { state } = api.load();
       const fresh = createInitialState({
@@ -177,6 +195,7 @@ export function createStorage(adapter) {
       });
       api.save(fresh);
       adapter.setItem(REVIEWS_KEY, '[]');
+      adapter.setItem(CUSTOM_KEY, JSON.stringify(emptyStore()));
       return fresh;
     },
 

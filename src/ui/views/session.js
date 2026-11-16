@@ -1,18 +1,21 @@
 // 卡片会话：全屏、无 tab 干扰，点卡片翻面，三键评分
 import { esc } from '../dom.js';
 import { currentItem, progress, MAX_RETRY } from '../../core/session.js';
+import { isCustomId } from '../../core/custom.js';
 
 const CHIP = { learn: '新词', review: '复习', extra: '加练' };
 
 export function sessionView(app) {
   const item = currentItem(app.session);
   if (!item) return '<div class="page"><p class="muted">队列空了</p></div>';
-  const w = app.wordMap.get(item.id) || { word: item.id, meaning: '（词条缺失）' };
+  const w = (app.wordOf ? app.wordOf(item.id) : app.wordMap.get(item.id))
+    || { word: item.id, meaning: '（词条缺失）' };
   const p = progress(app.session);
   // 主队列的进度按「已评分的不同词」算，补考单独显示，不会让进度条倒退
   const pct = p.mainTotal ? Math.round((p.mainDone / p.mainTotal) * 100) : 0;
   const inRetry = p.phase === 'retry';
-  const chip = inRetry ? '补考' : (CHIP[app.session.mode] || '复习');
+  const fromCustom = isCustomId(item.id);
+  const chip = inRetry ? '补考' : (fromCustom ? '生词' : (CHIP[app.session.mode] || '复习'));
   const counter = inRetry
     ? `补考 ${Math.min(item.tries, MAX_RETRY)}/${MAX_RETRY}`
     : `${p.mainDone}/${p.mainTotal}`;
