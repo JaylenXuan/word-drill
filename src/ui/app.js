@@ -243,7 +243,16 @@ function checkCustomWord(word, editingId = null) {
   }
   const deckHit = findInDeck(app.deck, word);
   if (deckHit) {
-    return { block: true, kind: 'bad', text: `「${deckHit.word}」已在雅思词库，不用重复建卡` };
+    const card = app.state.cards[deckHit.id];
+    // 已经学过的词：不建第二张卡，避免两套调度打架
+    if (card && card.state !== 'new') {
+      return { block: true, kind: 'bad', text: `「${deckHit.word}」已经学过了，不用重复建卡` };
+    }
+    // 还没学到：允许提前学，直接给词库那张卡开卡（不是新建生词）
+    return {
+      block: false, kind: 'warn', deckHit,
+      text: `「${deckHit.word}」在雅思词库里，还没轮到 · 保存就是提前学`,
+    };
   }
   const sib = findSuffixSibling(app.custom, word);
   if (sib) {
@@ -265,15 +274,36 @@ function openCustomEntry(id = null) {
 function saveCustomEntry() {
   const wordEl = document.getElementById('cw-word');
   const meanEl = document.getElementById('cw-meaning');
-  const check = validateEntry({ word: wordEl?.value, meaning: meanEl?.value });
-  if (!check.ok) { showToast(check.error); wordEl?.focus(); return; }
+  // 先只校验单词：词库里的词「提前学」时，释义由词库自带，不需要用户再填
+  const wordOnly = validateEntry({ word: wordEl?.value, meaning: 'x' });
+  if (!wordOnly.ok) { showToast(wordOnly.error); wordEl?.focus(); return; }
 
   const today = todayKey();
   const editingId = app.customDraft?.id || null;
-  const gate = checkCustomWord(check.word, editingId);
+  const gate = checkCustomWord(wordOnly.word, editingId);
 
   if (gate.block) { showToast(gate.text); return; }
   if (gate.dup) { openCustomEntry(gate.dup.id); return; }
+
+  // 词库里有但还没学到：提前学 —— 给词库那张卡开卡，不建生词、不产生第二张卡
+  if (gate.deckHit) {
+    const w = gate.deckHit;
+    const existing = app.state.cards[w.id];
+    if (existing && existing.state !== 'new') { showToast('这个词已经学过了'); return; }
+    app.state.cards[w.id] = {
+      ...createCard(w.id, app.state.config.deckId || CUSTOM_DECK_ID, today),
+      state: 'review', due: today, interval: 0,
+    };
+    app.storage.save(app.state);
+    app.customDraft = { id: null, word: '', meaning: '' };
+    render();
+    setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
+    showToast(`已提前学「${w.word}」，今天复习里见`);
+    return;
+  }
+
+  const check = validateEntry({ word: wordEl?.value, meaning: meanEl?.value });
+  if (!check.ok) { showToast(check.error); meanEl?.focus(); return; }
 
   if (!editingId) {
     const used = Number(app.state.daily[today]?.customAdded) || 0;
@@ -346,10 +376,21 @@ function refreshCustomHint() {
   const hint = document.getElementById('cw-hint');
   const save = document.getElementById('cw-save');
   if (!hint) return;
+  const editing = !!app.customDraft?.id;
   const gate = checkCustomWord(word, app.customDraft?.id || null);
   hint.textContent = gate.text;
   hint.className = `form-hint ${gate.kind || ''}`;
-  if (save && !save.dataset.locked) save.disabled = gate.block;
+  if (!save) return;
+
+  // 提前学不占生词名额，所以「今天录满了」也要放行
+  const full = !editing && !gate.deckHit
+    && (app.customUsedToday || 0) >= (app.customDailyLimit || 20);
+  save.disabled = gate.block || full;
+
+  if (editing) save.textContent = '保存修改';
+  else if (gate.deckHit) save.textContent = '提前学这个词';
+  else if (full) save.textContent = '今天录满了，明天再录';
+  else save.textContent = '保存并继续';
 }
 
 // ---------- 会话 ----------

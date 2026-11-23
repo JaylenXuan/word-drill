@@ -980,6 +980,21 @@ group('生词本（自定义词）');
     assert.equal(st.cards[id].due, addDays(T0, 1), '调度和普通词一致');
     assert.equal(st.cards[id].interval, 1);
   });
+  test('提前学：词库词建卡后不再进新词队列，评级也不算新词', () => {
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const w = ielts.words[0];
+    st.cards[w.id] = { ...createCard(w.id, 'ielts-core', T0), state: 'review', due: T0, interval: 0 };
+
+    const newQueue = buildNewQueue(ielts.words, st.cards, st.config, st.daily, T0);
+    assert.ok(!newQueue.includes(w.id), '提前学过的词不该再作为新词出现，否则就是重复学');
+    assert.ok(newQueue.includes(ielts.words[1].id), '其它词照常排队');
+    assert.ok(buildReviewQueue(st.cards, T0).includes(w.id), '应该立刻出现在今日复习');
+
+    applyGrade(st, 'good', w.id, T0, new Date(`${T0}T20:00:00`), { goalNew: 10 });
+    assert.equal(st.daily[T0].newLearned, 0, '提前学不占新词名额');
+    assert.equal(st.daily[T0].reviewsDone, 1);
+    assert.equal(st.cards[w.id].due, addDays(T0, 1), '调度从 0 开始，和普通词一致');
+  });
   test('导出/导入会把生词本一起带走；旧备份没有这个字段也不报错', () => {
     const s = createStorage(memoryAdapter());
     const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
