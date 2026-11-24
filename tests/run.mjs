@@ -10,7 +10,7 @@ import { createCard, schedule, previewIntervals, GRADES, MIN_EASE, MAX_EASE, MAX
 import { buildNewQueue, buildReviewQueue, buildMistakeList, newQuota, dueOn } from '../src/core/queue.js';
 import { dayMet, computeStreak, overview, recentDays } from '../src/core/stats.js';
 import {
-  createInitialState, createStorage, memoryAdapter, normalizeState,
+  createInitialState, createStorage, memoryAdapter, normalizeState, normalizeNotes,
   STATE_KEY,
 } from '../src/core/storage.js';
 import { applyGrade } from '../src/core/review.js';
@@ -1016,8 +1016,38 @@ group('生词本（自定义词）');
     const s = createStorage(memoryAdapter());
     s.save(createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10, onboarded: true }));
     s.saveCustom({ version: 1, words: { 'my-x': { id: 'my-x', word: 'mitigate', meaning: '减轻' } } });
+    s.saveNotes({ version: 1, notes: { 'ielts0001': { text: '课上讲的是缓和语气', updatedAt: null } } });
     s.reset();
     assert.deepEqual(Object.keys(s.loadCustom().words), []);
+    assert.deepEqual(Object.keys(s.loadNotes().notes), []);
+  });
+  test('「我的释义」独立存储：不动词库、不随评分丢失、导出导入一起走', () => {
+    const s = createStorage(memoryAdapter());
+    const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10 });
+    const w = ielts.words[0];
+    st.cards[w.id] = { ...createCard(w.id, 'ielts-core', T0), state: 'review', due: T0, interval: 0 };
+    s.save(st);
+    s.saveNotes({ version: 1, notes: { [w.id]: { text: '课上讲的是缓和语气', updatedAt: `${T0}T10:00:00Z` } } });
+
+    // 反复评分后仍然在（不是塞在卡片里被重写掉）
+    for (let i = 0; i < 3; i += 1) {
+      applyGrade(st, 'good', w.id, T0, new Date(`${T0}T20:00:00`), { goalNew: 10 });
+      s.save(st);
+    }
+    assert.equal(s.loadNotes().notes[w.id].text, '课上讲的是缓和语气');
+    assert.equal(w.meaning.length > 0, true, '词库原文没被改');
+
+    const text = s.exportJSON();
+    const other = createStorage(memoryAdapter());
+    other.importJSON(text);
+    assert.equal(other.loadNotes().notes[w.id].text, '课上讲的是缓和语气');
+
+    // 旧备份没有 notes 字段
+    const s2 = createStorage(memoryAdapter());
+    s2.importJSON(JSON.stringify({ app: 'word-drill', exportVersion: 1, state: st, reviews: [] }));
+    assert.deepEqual(Object.keys(s2.loadNotes().notes), []);
+    // 空白条目会被丢掉
+    assert.deepEqual(Object.keys(normalizeNotes({ notes: { x: { text: '   ' } } }).notes), []);
   });
 }
 

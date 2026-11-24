@@ -215,6 +215,15 @@ console.log('界面冒烟测试');
       wordOf: () => ({ word: 'abatement', meaning: '减少', phonetic: '/əˈbeɪt.mənt/' }),
     });
     if (svPhonetic.includes('əˈbeɪt')) fail('生词卡仍然显示了音标');
+    // 「我的释义」和词库原文同时出现
+    const s5 = buildSession('review', ['ielts0001']);
+    const svNote = sessionView({
+      session: s5, wordMap, flipped: true, lastGap: null,
+      notes: { notes: { ielts0001: { text: '课上讲的是缓和语气' } } },
+    });
+    if (!svNote.includes('课上讲的是缓和语气')) fail('卡片没显示我的释义');
+    if (!svNote.includes('词库')) fail('卡片没标出词库原文');
+    if (!svNote.includes('大气层')) fail('卡片没保留词库原文');
 
     if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 / 生词录入 / 生词本 都能渲染，界面无署名');
   } catch (e) {

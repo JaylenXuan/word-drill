@@ -15,6 +15,7 @@ export function sessionView(app) {
   const pct = p.mainTotal ? Math.round((p.mainDone / p.mainTotal) * 100) : 0;
   const inRetry = p.phase === 'retry';
   const fromCustom = isCustomId(item.id);
+  const myText = app.notes?.notes?.[item.id]?.text || '';
   const chip = inRetry ? '补考' : (fromCustom ? '生词' : (CHIP[app.session.mode] || '复习'));
   const counter = inRetry
     ? `补考 ${Math.min(item.tries, MAX_RETRY)}/${MAX_RETRY}`
@@ -45,7 +46,10 @@ export function sessionView(app) {
           <div class="face-inner start">
             <div class="word-small">${esc(w.word)}</div>
             <div class="pos">${esc(w.pos || '')}</div>
-            <div class="meaning">${esc(w.meaning)}</div>
+            ${myText
+              ? `<div class="meaning has-src"><span class="src-tag">我的</span>${esc(myText)}</div>
+                 <div class="meaning-src"><span class="src-tag">词库</span>${esc(w.meaning)}</div>`
+              : `<div class="meaning">${esc(w.meaning)}</div>`}
             ${w.note ? `<div class="note">${esc(w.note)}</div>` : ''}
             ${w.example ? `<div class="example">${esc(w.example)}</div>` : ''}
             ${w.exampleZh ? `<div class="example-zh">${esc(w.exampleZh)}</div>` : ''}

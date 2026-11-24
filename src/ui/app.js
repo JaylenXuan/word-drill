@@ -66,6 +66,7 @@ const app = {
   sound: createSound({ enabled: loadPrefs().sound }),
   persistState: null,
   custom: { version: 1, words: {} },
+  notes: { version: 1, notes: {} },
   customDraft: { id: null, word: '', meaning: '' },
   customUsedToday: 0,
   customDailyLimit: 20,
@@ -244,14 +245,16 @@ function checkCustomWord(word, editingId = null) {
   const deckHit = findInDeck(app.deck, word);
   if (deckHit) {
     const card = app.state.cards[deckHit.id];
-    // 已经学过的词：不建第二张卡，避免两套调度打架
-    if (card && card.state !== 'new') {
-      return { block: true, kind: 'bad', text: `「${deckHit.word}」已经学过了，不用重复建卡` };
-    }
-    // 还没学到：允许提前学，直接给词库那张卡开卡（不是新建生词）
+    const learned = !!card && card.state !== 'new';
+    // 已学过的词：不建第二张卡，但允许把释义存成「我的补充」
     return {
-      block: false, kind: 'warn', deckHit,
-      text: `「${deckHit.word}」在雅思词库里，还没轮到 · 保存就是提前学`,
+      block: false,
+      kind: learned ? '' : 'warn',
+      deckHit,
+      learned,
+      text: learned
+        ? `「${deckHit.word}」已经学过了 · 填一句释义就能改成你自己的（词库原文仍保留）`
+        : `「${deckHit.word}」在雅思词库里，还没轮到 · 保存就是提前学`,
     };
   }
   const sib = findSuffixSibling(app.custom, word);
@@ -285,20 +288,36 @@ function saveCustomEntry() {
   if (gate.block) { showToast(gate.text); return; }
   if (gate.dup) { openCustomEntry(gate.dup.id); return; }
 
-  // 词库里有但还没学到：提前学 —— 给词库那张卡开卡，不建生词、不产生第二张卡
+  // 词库词：提前学 + 把释义存成「我的补充」（不覆盖词库原文）
   if (gate.deckHit) {
     const w = gate.deckHit;
     const existing = app.state.cards[w.id];
-    if (existing && existing.state !== 'new') { showToast('这个词已经学过了'); return; }
-    app.state.cards[w.id] = {
-      ...createCard(w.id, app.state.config.deckId || CUSTOM_DECK_ID, today),
-      state: 'review', due: today, interval: 0,
-    };
-    app.storage.save(app.state);
+    const learned = !!existing && existing.state !== 'new';
+    const noteText = String(meanEl?.value || '').trim();
+
+    if (learned && !noteText) {
+      showToast('这个词已经学过了，想改成自己的释义就填一句');
+      meanEl?.focus();
+      return;
+    }
+
+    if (!learned) {
+      app.state.cards[w.id] = {
+        ...createCard(w.id, app.state.config.deckId || CUSTOM_DECK_ID, today),
+        state: 'review', due: today, interval: 0,
+      };
+      app.storage.save(app.state);
+    }
+    if (noteText) {
+      app.notes.notes[w.id] = { text: noteText, updatedAt: new Date().toISOString() };
+      app.storage.saveNotes(app.notes);
+    }
+
     app.customDraft = { id: null, word: '', meaning: '' };
     render();
     setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
-    showToast(`已提前学「${w.word}」，今天复习里见`);
+    if (learned) showToast('已保存你的释义，词库原文还在');
+    else showToast(`已提前学「${w.word}」${noteText ? '，并记下你的释义' : ''}，今天复习里见`);
     return;
   }
 
@@ -382,13 +401,19 @@ function refreshCustomHint() {
   hint.className = `form-hint ${gate.kind || ''}`;
   if (!save) return;
 
+  const noteText = String(document.getElementById('cw-meaning')?.value || '').trim();
+  if (gate.deckHit) {
+    // 已学过的词：只能存补充说明，没填就没得存
+    save.disabled = gate.learned && !noteText;
+    save.textContent = gate.learned ? '保存我的释义' : '提前学这个词';
+    return;
+  }
+
   // 提前学不占生词名额，所以「今天录满了」也要放行
-  const full = !editing && !gate.deckHit
-    && (app.customUsedToday || 0) >= (app.customDailyLimit || 20);
+  const full = !editing && (app.customUsedToday || 0) >= (app.customDailyLimit || 20);
   save.disabled = gate.block || full;
 
   if (editing) save.textContent = '保存修改';
-  else if (gate.deckHit) save.textContent = '提前学这个词';
   else if (full) save.textContent = '今天录满了，明天再录';
   else save.textContent = '保存并继续';
 }
@@ -710,6 +735,7 @@ function importFromBox() {
     const { warnings } = app.storage.importJSON(text);
     app.state = app.storage.load().state;
     app.custom = app.storage.loadCustom();
+    app.notes = app.storage.loadNotes();
     app.reviewTotal = app.storage.getReviews().length;
     app.tab = 'today';
     app.screen = 'home';
@@ -735,6 +761,7 @@ function resetProgress() {
   app.storage.reset();
   app.state = app.storage.load().state;
   app.custom = app.storage.loadCustom();
+  app.notes = app.storage.loadNotes();
   app.reviewTotal = 0;
   app.pendingLogs = [];
   app.tab = 'today';
@@ -783,7 +810,7 @@ async function requestPersistence() {
 root.addEventListener('input', (e) => {
   if (app.screen !== 'custom-entry') return;
   const id = e.target?.id;
-  if (id === 'cw-word') refreshCustomHint();
+  if (id === 'cw-word' || id === 'cw-meaning') refreshCustomHint();
 });
 
 document.addEventListener('keydown', (e) => {
@@ -839,6 +866,7 @@ async function boot() {
   const { state, warnings } = app.storage.load();
   app.state = state;
   app.custom = app.storage.loadCustom();
+  app.notes = app.storage.loadNotes();
   app.prefs = loadPrefs();
   app.sound.setEnabled(app.prefs.sound);
   app.reviewTotal = app.storage.getReviews().length;

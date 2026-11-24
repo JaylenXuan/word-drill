@@ -5,6 +5,20 @@
 import { todayKey } from './dates.js';
 import { CUSTOM_KEY, emptyStore, normalizeStore } from './custom.js';
 
+/** 词库词的「我的补充」：补充说明，不替换词库释义 */
+export const NOTES_KEY = 'vocab.v1/notes';
+
+export function normalizeNotes(raw) {
+  const notes = {};
+  const src = raw && typeof raw === 'object' && raw.notes && typeof raw.notes === 'object' ? raw.notes : {};
+  for (const [id, v] of Object.entries(src)) {
+    const text = String(v?.text || '').trim();
+    if (!id || !text) continue;
+    notes[id] = { text, updatedAt: v?.updatedAt || null };
+  }
+  return { version: 1, notes };
+}
+
 export const SCHEMA_VERSION = 1;
 export const STATE_KEY = 'vocab.v1/state';
 export const REVIEWS_KEY = 'vocab.v1/reviews';
@@ -154,12 +168,27 @@ export function createStorage(adapter) {
       adapter.setItem(CUSTOM_KEY, JSON.stringify(custom));
     },
 
+    /** 词库词的补充说明：和调度状态分开存，评分时不会被重写 */
+    loadNotes() {
+      try {
+        const raw = adapter.getItem(NOTES_KEY);
+        return raw ? normalizeNotes(JSON.parse(raw)) : { version: 1, notes: {} };
+      } catch {
+        return { version: 1, notes: {} };
+      }
+    },
+
+    saveNotes(notes) {
+      adapter.setItem(NOTES_KEY, JSON.stringify(notes));
+    },
+
     /** 导出成可复制的文本（iOS 上是唯一的备份手段） */
     exportJSON() {
       const { state, reviews } = api.load();
       const custom = api.loadCustom();
+      const notes = api.loadNotes();
       return JSON.stringify(
-        { app: 'word-drill', exportVersion: 1, exportedAt: new Date().toISOString(), state, reviews, custom },
+        { app: 'word-drill', exportVersion: 1, exportedAt: new Date().toISOString(), state, reviews, custom, notes },
         null,
         2,
       );
@@ -179,13 +208,15 @@ export function createStorage(adapter) {
       const { state, warnings } = normalizeState(parsed.state);
       const reviews = Array.isArray(parsed.reviews) ? parsed.reviews : [];
       const custom = normalizeStore(parsed.custom);
+      const notes = normalizeNotes(parsed.notes);
       api.save(state);
       adapter.setItem(REVIEWS_KEY, JSON.stringify(reviews));
       adapter.setItem(CUSTOM_KEY, JSON.stringify(custom));
-      return { state, reviews, custom, warnings };
+      adapter.setItem(NOTES_KEY, JSON.stringify(notes));
+      return { state, reviews, custom, notes, warnings };
     },
 
-    /** 清空全部进度（保留每日新词数、词库、引导状态）；生词本一并清空 */
+    /** 清空全部进度（保留每日新词数、词库、引导状态）；生词本和补充说明一并清空 */
     reset() {
       const { state } = api.load();
       const fresh = createInitialState({
@@ -196,6 +227,7 @@ export function createStorage(adapter) {
       api.save(fresh);
       adapter.setItem(REVIEWS_KEY, '[]');
       adapter.setItem(CUSTOM_KEY, JSON.stringify(emptyStore()));
+      adapter.setItem(NOTES_KEY, JSON.stringify({ version: 1, notes: {} }));
       return fresh;
     },
 
