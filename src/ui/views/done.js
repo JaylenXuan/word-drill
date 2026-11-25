@@ -14,16 +14,12 @@ function pickLine({ mode, met, streak, newLearned, goal }) {
   return `今天 ${newLearned} 个，收工。`;
 }
 
-/** 补考小结：做了几次、有几个认不下来交给明天 */
+/** 补考小结：这一场重考了几次 */
 function retryNote(session) {
   if (!session) return '';
   const total = session.retry?.length || 0;
-  const exhausted = session.exhausted || 0;
-  if (!total && !exhausted) return '';
-  const parts = [];
-  if (total) parts.push(`补考 ${total} 次`);
-  if (exhausted) parts.push(`${exhausted} 个还没过，明天按调度再来`);
-  return `<p class="muted small retry-note">${parts.join(' · ')}</p>`;
+  if (!total) return '';
+  return `<p class="muted small retry-note">补考 ${total} 次</p>`;
 }
 
 export function doneView(app, ctx) {

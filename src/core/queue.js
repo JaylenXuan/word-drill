@@ -34,15 +34,34 @@ export function buildNewQueue(words, cards, config, daily, today = todayKey()) {
 /**
  * 今日复习队列：state 不是 new 且 due <= 今天。
  * 排序：到期日早的优先（欠得久的先还），同一天到期的按错误次数多的优先。
+ *
+ * opts.shuffle=true 时，只把「同一天到期」的那一段打乱——到期早的仍然排在前面，
+ * 但每天开复习不会总是同一个顺序。opts.rand 可注入，方便测试。
  */
-export function buildReviewQueue(cards, today = todayKey()) {
-  return Object.values(cards)
+export function buildReviewQueue(cards, today = todayKey(), opts = {}) {
+  const sorted = Object.values(cards)
     .filter((c) => c && c.state !== 'new' && c.due <= today)
     .sort((a, b) => {
       if (a.due !== b.due) return a.due < b.due ? -1 : 1;
       return (b.lapses || 0) - (a.lapses || 0);
-    })
-    .map((c) => c.wordId);
+    });
+
+  if (opts.shuffle) {
+    const rand = typeof opts.rand === 'function' ? opts.rand : Math.random;
+    let start = 0;
+    while (start < sorted.length) {
+      let end = start + 1;
+      while (end < sorted.length && sorted[end].due === sorted[start].due) end += 1;
+      // Fisher-Yates，只在这段内部换
+      for (let i = end - 1; i > start; i -= 1) {
+        const j = start + Math.floor(rand() * (i - start + 1));
+        [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
+      }
+      start = end;
+    }
+  }
+
+  return sorted.map((c) => c.wordId);
 }
 
 /** 错词本：最近一次评分是「不认识」，或累计错 >= 2 次 */

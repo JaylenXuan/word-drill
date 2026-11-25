@@ -1,11 +1,9 @@
 // 学习会话：分两段
 //
 //   main  —— 新词（或复习）主队列。开多少张就是多少张，只减不增。
-//   retry —— 补考队列。只有「不认识」会进来，同一个词当天最多补考 MAX_RETRY 次。
+//   retry —— 补考队列。「不认识」就进来，不设次数上限：点多少次不认识就重考多少次。
 //
 // 这样「今日新词 10 个」永远是 10 个不同的词：补考既不占名额，也不增加主队列长度。
-
-export const MAX_RETRY = 3;
 
 /** mode: 'learn' 学新词 | 'review' 复习到期 | 'extra' 今天加练 */
 export function buildSession(mode, wordIds) {
@@ -15,7 +13,6 @@ export function buildSession(mode, wordIds) {
     mainIndex: 0,
     retry: [], // { id, tries }，tries 表示这是第几次补考
     retryIndex: 0,
-    exhausted: 0, // 补考次数用尽、交给明天的词数
     graded: 0,
     againCount: 0,
   };
@@ -54,17 +51,16 @@ export function progress(session) {
     mainTotal: session.main.length,
     retryLeft: Math.max(0, session.retry.length - session.retryIndex),
     retryTotal: session.retry.length,
-    exhausted: session.exhausted,
   };
 }
 
 /**
  * 记录一次评分并推进。
- * 「不认识」→ 进补考队列；补考满 MAX_RETRY 次后不再入队，交给明天按调度来。
+ * 「不认识」→ 永远回到补考队列，直到用户自己点「模糊」或「认识」。
  */
 export function gradeSession(session, grade) {
   const item = currentItem(session);
-  if (!item) return { requeued: false, exhausted: false };
+  if (!item) return { requeued: false };
 
   session.graded += 1;
   if (grade === 'again') session.againCount += 1;
@@ -73,17 +69,11 @@ export function gradeSession(session, grade) {
   else session.retryIndex += 1;
 
   let requeued = false;
-  let exhausted = false;
   if (grade === 'again') {
-    if (item.tries < MAX_RETRY) {
-      session.retry.push({ id: item.id, tries: item.tries + 1 });
-      requeued = true;
-    } else {
-      session.exhausted += 1;
-      exhausted = true;
-    }
+    session.retry.push({ id: item.id, tries: item.tries + 1 });
+    requeued = true;
   }
-  return { requeued, exhausted };
+  return { requeued };
 }
 
 export function sessionSummary(session) {
@@ -92,7 +82,6 @@ export function sessionSummary(session) {
     graded: session.graded,
     again: session.againCount,
     retryTotal: session.retry.length,
-    exhausted: session.exhausted,
     unique: new Set([...session.main, ...session.retry.map((r) => r.id)]).size,
   };
 }

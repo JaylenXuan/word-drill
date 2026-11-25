@@ -382,14 +382,18 @@ button { font-family: inherit; cursor: pointer; }
 .pos { color: var(--text-muted); font-size: 13px; }
 .word-small { font-size: 15px; color: var(--text-muted); letter-spacing: 0.01em; }
 .meaning { font-size: 25px; font-weight: 600; line-height: 1.45; }
-/* 同时有「我的」和「词库」两行时，把字号拉近，避免看起来像替换 */
-.meaning.has-src { font-size: 20px; }
-.meaning-src {
-  margin-top: 8px;
-  font-size: 17px;
+/* 自己加的补充：另起一条，不顶替词库释义 */
+.my-extra {
+  margin-top: 10px;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 1.5;
-  color: var(--text-muted);
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  width: 100%;
 }
 .src-tag {
   display: inline-block;

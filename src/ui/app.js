@@ -105,7 +105,8 @@ function context() {
   const cfg = app.state.config;
   const deck = app.deck;
   const entry = app.state.daily[today] || { newLearned: 0, reviewsDone: 0, goalNew: cfg.dailyNewTarget };
-  const due = deck ? buildReviewQueue(app.state.cards, today) : [];
+  // 同一到期日的内部打乱：每天开复习不会总是同一个顺序，到期早的仍然优先
+  const due = deck ? buildReviewQueue(app.state.cards, today, { shuffle: true }) : [];
   const newIds = deck ? buildNewQueue(deck.words, app.state.cards, cfg, app.state.daily, today) : [];
   const { current, best } = computeStreak(app.state.daily, today);
   const cardList = Object.values(app.state.cards);
@@ -253,7 +254,7 @@ function checkCustomWord(word, editingId = null) {
       deckHit,
       learned,
       text: learned
-        ? `「${deckHit.word}」已经学过了 · 填一句释义就能改成你自己的（词库原文仍保留）`
+        ? `「${deckHit.word}」已经学过了 · 填一句可以加一条补充（词库释义不动）`
         : `「${deckHit.word}」在雅思词库里，还没轮到 · 保存就是提前学`,
     };
   }
@@ -296,7 +297,7 @@ function saveCustomEntry() {
     const noteText = String(meanEl?.value || '').trim();
 
     if (learned && !noteText) {
-      showToast('这个词已经学过了，想改成自己的释义就填一句');
+      showToast('这个词已经学过了，想加补充就填一句');
       meanEl?.focus();
       return;
     }
@@ -316,8 +317,8 @@ function saveCustomEntry() {
     app.customDraft = { id: null, word: '', meaning: '' };
     render();
     setTimeout(() => document.getElementById('cw-word')?.focus(), 60);
-    if (learned) showToast('已保存你的释义，词库原文还在');
-    else showToast(`已提前学「${w.word}」${noteText ? '，并记下你的释义' : ''}，今天复习里见`);
+    if (learned) showToast('已保存补充');
+    else showToast(`已提前学「${w.word}」${noteText ? '，并加了一条补充' : ''}，今天复习里见`);
     return;
   }
 
@@ -405,7 +406,7 @@ function refreshCustomHint() {
   if (gate.deckHit) {
     // 已学过的词：只能存补充说明，没填就没得存
     save.disabled = gate.learned && !noteText;
-    save.textContent = gate.learned ? '保存我的释义' : '提前学这个词';
+    save.textContent = gate.learned ? '保存补充' : '提前学这个词';
     return;
   }
 

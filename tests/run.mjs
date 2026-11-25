@@ -17,7 +17,7 @@ import { applyGrade } from '../src/core/review.js';
 import { auditNewWords } from '../src/core/audit.js';
 import { createSound } from '../src/ui/sound.js';
 import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from '../src/ui/prefs.js';
-import { buildSession, currentItem, gradeSession, isFinished, remaining, sessionSummary, progress, MAX_RETRY } from '../src/core/session.js';
+import { buildSession, currentItem, gradeSession, isFinished, remaining, sessionSummary, progress } from '../src/core/session.js';
 import { simulateDays } from '../src/core/simulate.js';
 
 // ---------- 极简测试框架 ----------
@@ -289,6 +289,26 @@ test('复习队列只取到期卡，按到期日升序、同到期按错数降�
   cards.w4 = { ...cards.w4, state: 'review', due: T0, interval: 1, lapses: 1 };
   assert.deepEqual(buildReviewQueue(cards, T0), ['w2', 'w3', 'w4']);
 });
+test('复习队列可以打乱同一天到期的卡，但到期更早的仍然优先', () => {
+  const cards = freshCards();
+  for (const id of ['w1', 'w2', 'w3', 'w4']) {
+    cards[id] = { ...cards[id], state: 'review', due: T0, interval: 1, lapses: 0 };
+  }
+  cards.w5 = { ...cards.w5, state: 'review', due: addDays(T0, -3), interval: 1, lapses: 0 };
+
+  const seq = (arr) => { let i = 0; return () => arr[i++ % arr.length]; };
+  const a = buildReviewQueue(cards, T0, { shuffle: true, rand: seq([0.1, 0.9, 0.4, 0.7, 0.2, 0.6]) });
+  const b = buildReviewQueue(cards, T0, { shuffle: true, rand: seq([0.9, 0.1, 0.8, 0.3, 0.6, 0.2]) });
+
+  assert.equal(a[0], 'w5', '到期更早的必须排第一');
+  assert.equal(b[0], 'w5');
+  assert.notDeepEqual(a, b, '不同随机种子应给出不同顺序');
+  assert.deepEqual([...a].sort(), ['w1', 'w2', 'w3', 'w4', 'w5'], '不能丢词或重复');
+  assert.deepEqual([...b].sort(), ['w1', 'w2', 'w3', 'w4', 'w5']);
+
+  // 不开启时顺序固定（其它调用方依赖这个确定性）
+  assert.deepEqual(buildReviewQueue(cards, T0), buildReviewQueue(cards, T0));
+});
 test('错词本：最近一次不认识 或 错>=2 次', () => {
   const cards = freshCards();
   cards.w1 = { ...cards.w1, state: 'review', lastGrade: 'again', lapses: 1 };
@@ -498,17 +518,19 @@ test('「认识」和「模糊」都不进补考（保持 SM-2 语义）', () =>
   assert.equal(s.retry.length, 0);
   assert.equal(isFinished(s), true);
 });
-test(`同一个词最多补考 ${MAX_RETRY} 次，之后交给明天`, () => {
+test('「不认识」不限次数：点几次就重考几次，队列不会自己结束', () => {
   const s = buildSession('learn', ['a']);
-  let requeues = 0;
-  for (let i = 0; i < 10 && !isFinished(s); i += 1) {
-    if (gradeSession(s, 'again').requeued) requeues += 1;
+  for (let i = 0; i < 10; i += 1) {
+    assert.equal(gradeSession(s, 'again').requeued, true, `第 ${i + 1} 次应该重新入队`);
+    assert.equal(isFinished(s), false, '一直不认识就不该结束');
+    assert.equal(currentItem(s).id, 'a');
+    assert.equal(currentItem(s).tries, i + 1);
   }
-  assert.equal(requeues, MAX_RETRY, `补考次数应为 ${MAX_RETRY}`);
-  assert.equal(s.exhausted, 1, '用尽后应记为交给明天');
+  assert.equal(s.retry.length, 10);
+  assert.equal(s.graded, 10);
+  // 点一次「认识」就能收尾
+  gradeSession(s, 'good');
   assert.equal(isFinished(s), true);
-  // 1 次主队列 + 3 次补考 = 4 次评分
-  assert.equal(s.graded, MAX_RETRY + 1);
 });
 test('主队列全部走完才进补考阶段', () => {
   const s = buildSession('learn', ['a', 'b']);
@@ -594,21 +616,26 @@ group('今日新词口径（补考不占名额、不重复计数）');
     const st = createInitialState({ deckId: 'ielts-core', dailyNewTarget: 10, onboarded: true });
     const words = ielts.words.slice(0, 10);
     const s = buildSession('learn', buildNewQueue(words, st.cards, st.config, st.daily, T0));
-    let guard = 0;
-    while (!isFinished(s) && guard < 100) {
+    // 主队列 10 个全部「不认识」
+    while (!isFinished(s) && currentItem(s).phase === 'main') {
       const item = currentItem(s);
       applyGrade(st, 'again', item.id, T0, new Date(), { goalNew: 10 });
       gradeSession(s, 'again');
-      guard += 1;
     }
     assert.equal(st.daily[T0].newLearned, 10, '只学了 10 个不同的词');
     assert.equal(st.daily[T0].goalNew, 10);
     assert.equal(dayMet(st.daily[T0]), true, '全都不认识也算完成 10 个新词');
     assert.equal(s.main.length, 10, '主队列不该被补考撑大');
-    assert.equal(s.retry.length, 30, '10 个词 × 各 3 次补考');
-    assert.equal(st.daily[T0].reviewsDone, 30, '补考记为复习，不计新词');
+    assert.equal(s.retry.length, 10, '每个词各进一次补考');
+
+    // 补考阶段全部「认识」，队列收尾
+    while (!isFinished(s)) {
+      const item = currentItem(s);
+      applyGrade(st, 'good', item.id, T0, new Date(), { goalNew: 10 });
+      gradeSession(s, 'good');
+    }
+    assert.equal(st.daily[T0].reviewsDone, 10, '补考记为复习，不计新词');
     assert.equal(Object.keys(st.cards).length, 10);
-    assert.equal(s.exhausted, 10, '第 4 次不认识不再入队，交给明天');
   });
 
   test('「模糊」不产生补考，也不占额外名额', () => {

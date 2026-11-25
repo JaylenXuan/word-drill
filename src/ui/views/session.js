@@ -1,6 +1,6 @@
 // 卡片会话：全屏、无 tab 干扰，点卡片翻面，三键评分
 import { esc } from '../dom.js';
-import { currentItem, progress, MAX_RETRY } from '../../core/session.js';
+import { currentItem, progress } from '../../core/session.js';
 import { isCustomId } from '../../core/custom.js';
 
 const CHIP = { learn: '新词', review: '复习', extra: '加练' };
@@ -17,9 +17,7 @@ export function sessionView(app) {
   const fromCustom = isCustomId(item.id);
   const myText = app.notes?.notes?.[item.id]?.text || '';
   const chip = inRetry ? '补考' : (fromCustom ? '生词' : (CHIP[app.session.mode] || '复习'));
-  const counter = inRetry
-    ? `补考 ${Math.min(item.tries, MAX_RETRY)}/${MAX_RETRY}`
-    : `${p.mainDone}/${p.mainTotal}`;
+  const counter = inRetry ? `补考第 ${item.tries} 次` : `${p.mainDone}/${p.mainTotal}`;
   // 长词/多拼写要缩字号，否则会撑破卡片
   const sizeClass = w.word.length > 16 ? 'xlong' : w.word.length > 11 ? 'long' : '';
 
@@ -46,10 +44,8 @@ export function sessionView(app) {
           <div class="face-inner start">
             <div class="word-small">${esc(w.word)}</div>
             <div class="pos">${esc(w.pos || '')}</div>
-            ${myText
-              ? `<div class="meaning has-src"><span class="src-tag">我的</span>${esc(myText)}</div>
-                 <div class="meaning-src"><span class="src-tag">词库</span>${esc(w.meaning)}</div>`
-              : `<div class="meaning">${esc(w.meaning)}</div>`}
+            <div class="meaning">${esc(w.meaning)}</div>
+            ${myText ? `<div class="my-extra"><span class="src-tag">补充</span>${esc(myText)}</div>` : ''}
             ${w.note ? `<div class="note">${esc(w.note)}</div>` : ''}
             ${w.example ? `<div class="example">${esc(w.example)}</div>` : ''}
             ${w.exampleZh ? `<div class="example-zh">${esc(w.exampleZh)}</div>` : ''}
