@@ -79,3 +79,16 @@ export function buildMistakeList(cards, minLapses = 2) {
 export function dueOn(cards, day) {
   return Object.values(cards).filter((c) => c && c.state !== 'new' && c.due === day).length;
 }
+
+/**
+ * 今天评过「不认识」的词：退出会话后还能接着补考。
+ * 注意 lastReviewedAt 是 UTC 字符串，必须转成本地日期再比，否则早上 8 点前会算成昨天。
+ */
+export function todayAgainIds(cards, today = todayKey()) {
+  return Object.values(cards)
+    .filter((c) => {
+      if (!c || c.lastGrade !== 'again' || !c.lastReviewedAt) return false;
+      return todayKey(new Date(c.lastReviewedAt)) === today;
+    })
+    .map((c) => c.wordId);
+}

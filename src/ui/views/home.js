@@ -21,9 +21,9 @@ export function homeView(ctx) {
     ? `<button class="link" data-action="start-review-light">先清 20 张（最低可行日）</button>`
     : '';
 
-  // 今天评过「不认识」的词：可选加练，不占新词名额，也不影响打卡
-  const extraLink = (ctx.extraIds?.length || 0) > 0
-    ? `<button class="link" data-action="start-extra">今天加练 ${Math.min(10, ctx.extraIds.length)} 个 · 不算进新词</button>`
+  // 今天评过「不认识」的词：退出会话后还能接着补考
+  const retryLink = (ctx.retryIds?.length || 0) > 0
+    ? `<button class="link" data-action="start-extra">补考 ${Math.min(20, ctx.retryIds.length)} 个 · 今天还没过</button>`
     : '';
 
   return `
@@ -55,7 +55,7 @@ export function homeView(ctx) {
   <div class="actions">
     ${cta}
     ${lightLink}
-    ${extraLink}
+    ${retryLink}
   </div>
 
   <section class="meta">

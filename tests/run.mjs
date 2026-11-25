@@ -7,7 +7,7 @@ import path from 'node:path';
 
 import { addDays, daysBetween, todayKey, isValidKey } from '../src/core/dates.js';
 import { createCard, schedule, previewIntervals, GRADES, MIN_EASE, MAX_EASE, MAX_INTERVAL } from '../src/core/scheduler.js';
-import { buildNewQueue, buildReviewQueue, buildMistakeList, newQuota, dueOn } from '../src/core/queue.js';
+import { buildNewQueue, buildReviewQueue, buildMistakeList, newQuota, dueOn, todayAgainIds } from '../src/core/queue.js';
 import { dayMet, computeStreak, overview, recentDays } from '../src/core/stats.js';
 import {
   createInitialState, createStorage, memoryAdapter, normalizeState, normalizeNotes,
@@ -288,6 +288,24 @@ test('复习队列只取到期卡，按到期日升序、同到期按错数降�
   cards.w3 = { ...cards.w3, state: 'review', due: T0, interval: 1, lapses: 3 };
   cards.w4 = { ...cards.w4, state: 'review', due: T0, interval: 1, lapses: 1 };
   assert.deepEqual(buildReviewQueue(cards, T0), ['w2', 'w3', 'w4']);
+});
+test('今天「不认识」的词：含生词、按本地日期算', () => {
+  // 用本地时间构造，避免依赖运行机器的时区
+  const local = (d, h, min = 0) => {
+    const [y, m, day] = d.split('-').map(Number);
+    return new Date(y, m - 1, day, h, min).toISOString();
+  };
+  const cards = {
+    a: { wordId: 'a', state: 'review', lastGrade: 'again', lastReviewedAt: local('2026-11-25', 16, 30) },
+    b: { wordId: 'b', state: 'review', lastGrade: 'again', lastReviewedAt: local('2026-11-25', 7, 30) },
+    my1: { wordId: 'my1', state: 'review', lastGrade: 'again', lastReviewedAt: local('2026-11-25', 9) },
+    c: { wordId: 'c', state: 'review', lastGrade: 'good', lastReviewedAt: local('2026-11-25', 16, 30) },
+    d: { wordId: 'd', state: 'review', lastGrade: 'again', lastReviewedAt: local('2026-11-23', 16, 30) },
+  };
+  assert.deepEqual(todayAgainIds(cards, '2026-11-25').sort(), ['a', 'b', 'my1']);
+  assert.deepEqual(todayAgainIds(cards, '2026-11-24'), []);
+  assert.deepEqual(todayAgainIds(cards, '2026-11-23'), ['d']);
+  assert.deepEqual(todayAgainIds({}, '2026-11-25'), []);
 });
 test('复习队列可以打乱同一天到期的卡，但到期更早的仍然优先', () => {
   const cards = freshCards();
@@ -1157,3 +1175,4 @@ if (stat.fail === 0) {
   for (const f of stat.failures) console.log(`  - [${f.group}] ${f.name}`);
   process.exitCode = 1;
 }
+

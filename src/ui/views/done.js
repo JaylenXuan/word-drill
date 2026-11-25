@@ -42,9 +42,14 @@ export function doneView(app, ctx) {
       <div class="meta-item"><b>${ctx.tomorrow}</b><span>明日到期</span></div>
     </section>
 
+    ${(ctx.retryIds?.length || 0) > 0
+      ? `<div class="actions"><button class="primary" data-action="start-extra">补考 ${Math.min(20, ctx.retryIds.length)} 个</button></div>`
+      : ''}
     ${ctx.due.length > 0
-      ? `<div class="actions"><button class="primary" data-action="start-review">继续清 ${ctx.due.length} 张复习</button></div>`
-      : `<div class="actions"><button class="primary" data-action="go-home">回到首页</button></div>`}
+      ? `<div class="actions"><button class="primary${(ctx.retryIds?.length || 0) > 0 ? ' ghost' : ''}" data-action="start-review">继续清 ${ctx.due.length} 张复习</button></div>`
+      : (ctx.retryIds?.length || 0) > 0
+        ? `<div class="actions"><button class="link" data-action="go-home">先回首页</button></div>`
+        : `<div class="actions"><button class="primary" data-action="go-home">回到首页</button></div>`}
     ${ctx.due.length > 0 ? `<div class="actions"><button class="link" data-action="go-home">先回首页</button></div>` : ''}
   </div>`;
 }

@@ -2,7 +2,7 @@
 // 只做三件事：把状态算成 ctx、把 ctx 渲染成 HTML、把点击/按键变成状态变更。
 
 import { createStorage, localAdapter } from '../core/storage.js';
-import { buildNewQueue, buildReviewQueue, dueOn, buildMistakeList } from '../core/queue.js';
+import { buildNewQueue, buildReviewQueue, dueOn, buildMistakeList, todayAgainIds } from '../core/queue.js';
 import { computeStreak } from '../core/stats.js';
 import { todayKey, addDays } from '../core/dates.js';
 import { applyGrade } from '../core/review.js';
@@ -117,15 +117,8 @@ function context() {
     : 0;
   // 目标封顶：词库只剩 3 个时，今天的目标就是 3，学完照样算达标
   const goalNew = Math.max(1, Math.min(cfg.dailyNewTarget, newLeftInDeck));
-  // 「今天加练」：今天评过「不认识」的词，可选加练，不进新词名额
-  const extraIds = deck
-    ? deck.words
-      .filter((w) => {
-        const c = app.state.cards[w.id];
-        return c && c.lastGrade === 'again' && String(c.lastReviewedAt || '').slice(0, 10) === today;
-      })
-      .map((w) => w.id)
-    : [];
+  // 今天评过「不认识」的词：退出会话后还能补考。词库词和生词都算。
+  const retryIds = todayAgainIds(app.state.cards, today);
 
   // 生词本
   const customList = Object.values(app.custom?.words || {});
@@ -147,7 +140,7 @@ function context() {
     learned,
     newLeftInDeck,
     goalNew,
-    extraIds,
+    retryIds,
     customCount: customList.length,
     customDue,
     customAddedToday: Number(entry.customAdded) || 0,
@@ -423,7 +416,7 @@ function refreshCustomHint() {
 
 function startSession(mode, limit = 0) {
   const ctx = app.ctx || context();
-  const source = mode === 'learn' ? ctx.newIds : mode === 'extra' ? ctx.extraIds : ctx.due;
+  const source = mode === 'learn' ? ctx.newIds : mode === 'extra' ? ctx.retryIds : ctx.due;
   let ids = source;
   if (limit > 0) ids = ids.slice(0, limit);
   if (!ids.length) {
@@ -551,7 +544,7 @@ root.addEventListener('click', async (e) => {
       startSession('review', 20);
       break;
     case 'start-extra':
-      startSession('extra', 10);
+      startSession('extra', 20);
       break;
     case 'exit-session':
       flushLogs();
