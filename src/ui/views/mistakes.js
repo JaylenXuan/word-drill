@@ -12,7 +12,7 @@ export function mistakesView(ctx) {
     <div class="page empty-page">
       <img class="mascot sm" src="assets/whale/icon-preview.png" alt="" width="88" height="88" decoding="async">
       <h1 class="done-title">错词本是空的</h1>
-      <p class="muted">最近一次评为「不认识」、或累计错 2 次以上的词，会自动收进来。</p>
+      <p class="muted">最近一次评为「不认识」或「模糊」的词会收进来，答对就移出。</p>
       <div class="actions"><button class="primary" data-action="go-home">回到今日</button></div>
     </div>`;
   }
@@ -39,7 +39,7 @@ export function mistakesView(ctx) {
     <header class="topbar">
       <div class="topbar-main">
         <div class="date">错词本</div>
-        <div class="sub">最近一次不认识，或累计错 2 次以上</div>
+        <div class="sub">最近一次没答好的词，答对就移出</div>
       </div>
       <div class="streak-badge">${ids.length}</div>
     </header>

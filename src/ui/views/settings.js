@@ -131,7 +131,7 @@ export function settingsView(app, ctx) {
 
     <section class="card">
       <h2>关于</h2>
-      <div class="kv"><span>版本</span><span>0.12.3</span></div>
+      <div class="kv"><span>版本</span><span>0.12.4</span></div>
       <div class="kv"><span>词库</span><span>雅思词汇真经 ${ctx.total} 词</span></div>
       <div class="kv"><span>来源</span><span>github.com/hefengxian/my-ielts</span></div>
       <div class="kv"><span>协议</span><span>原仓库未声明 LICENSE，仅个人学习用</span></div>
@@ -141,6 +141,7 @@ export function settingsView(app, ctx) {
     </section>
   </div>`;
 }
+
 
 
 

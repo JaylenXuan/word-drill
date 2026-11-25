@@ -1,4 +1,4 @@
-﻿// 自检脚本：node tests/run.mjs
+// 自检脚本：node tests/run.mjs
 // 零依赖（只用 node:assert），失败时进程退出码为 1，可直接接 CI 或手跑。
 
 import assert from 'node:assert/strict';
@@ -328,12 +328,20 @@ test('复习队列可以打乱同一天到期的卡，但到期更早的仍然�
   // 不开启时顺序固定（其它调用方依赖这个确定性）
   assert.deepEqual(buildReviewQueue(cards, T0), buildReviewQueue(cards, T0));
 });
-test('错词本：最近一次不认识 或 错>=2 次', () => {
+test('错词本：只看最近一次，答对就移出', () => {
   const cards = freshCards();
   cards.w1 = { ...cards.w1, state: 'review', lastGrade: 'again', lapses: 1 };
-  cards.w2 = { ...cards.w2, state: 'review', lastGrade: 'good', lapses: 2 };
+  cards.w2 = { ...cards.w2, state: 'review', lastGrade: 'good', lapses: 2 }; // 累计错过 2 次，但最近答对
   cards.w3 = { ...cards.w3, state: 'review', lastGrade: 'good', lapses: 0 };
-  assert.deepEqual(buildMistakeList(cards), ['w2', 'w1']);
+  cards.w4 = { ...cards.w4, state: 'review', lastGrade: 'hard', lapses: 0 };
+  assert.deepEqual(buildMistakeList(cards), ['w1', 'w4']);
+
+  // 复习一遍：w1 答对就离开，w4 继续留着，w2 再次答错又进来
+  const st = { cards: { ...cards }, daily: {}, config: { dailyNewTarget: 10 } };
+  applyGrade(st, 'good', 'w1', T0, new Date(), { goalNew: 10 });
+  applyGrade(st, 'good', 'w4', T0, new Date(), { goalNew: 10 });
+  applyGrade(st, 'again', 'w2', T0, new Date(), { goalNew: 10 });
+  assert.deepEqual(buildMistakeList(st.cards), ['w2'], '复习后应该减少，而不是只增不减');
 });
 test('dueOn 统计某天的到期数（明日预告）', () => {
   const cards = freshCards();

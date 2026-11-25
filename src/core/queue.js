@@ -64,10 +64,14 @@ export function buildReviewQueue(cards, today = todayKey(), opts = {}) {
   return sorted.map((c) => c.wordId);
 }
 
-/** 错词本：最近一次评分是「不认识」，或累计错 >= 2 次 */
-export function buildMistakeList(cards, minLapses = 2) {
+/**
+ * 错词本：最近一次评分是「不认识」或「模糊」。
+ * 只看最近一次，不看累计——否则错过的词会永远留在本子里，越滚越多。
+ * 答对一次（认识）就移出。
+ */
+export function buildMistakeList(cards) {
   return Object.values(cards)
-    .filter((c) => c && c.state !== 'new' && (c.lastGrade === 'again' || (c.lapses || 0) >= minLapses))
+    .filter((c) => c && c.state !== 'new' && (c.lastGrade === 'again' || c.lastGrade === 'hard'))
     .sort((a, b) => {
       if ((b.lapses || 0) !== (a.lapses || 0)) return (b.lapses || 0) - (a.lapses || 0);
       return a.due < b.due ? -1 : 1;
