@@ -563,7 +563,7 @@ root.addEventListener('click', async (e) => {
     case 'speak': {
       e.stopPropagation();
       const item = currentItem(app.session);
-      const w = item && app.wordMap.get(item.id);
+      const w = item ? app.wordOf(item.id) : null; // 生词本里的词也要能发音
       if (w) speak(w.word);
       break;
     }

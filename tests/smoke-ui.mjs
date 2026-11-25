@@ -225,6 +225,9 @@ console.log('界面冒烟测试');
     if (!svNote.includes('补充')) fail('补充没有标签');
     if (!svNote.includes('大气层')) fail('卡片没保留词库释义');
     if (!svNote.includes('class="meaning"')) fail('词库释义不该被替换掉');
+    // 翻面后也要能发音：正反面各一个按钮
+    const speakBtns = (svNote.match(/data-action="speak"/g) || []).length;
+    if (speakBtns < 2) fail(`翻面后没有发音按钮（只有 ${speakBtns} 个）`);
 
     if (!failed) console.log('  ✓ 错词本 / 统计 / 设置 / 完成页 / 生词录入 / 生词本 都能渲染，界面无署名');
   } catch (e) {

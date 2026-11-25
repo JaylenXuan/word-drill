@@ -42,7 +42,10 @@ export function sessionView(app) {
         </div>
         <div class="face back">
           <div class="face-inner start">
-            <div class="word-small">${esc(w.word)}</div>
+            <div class="word-row">
+              <div class="word-small">${esc(w.word)}</div>
+              <button class="speak sm" data-action="speak" aria-label="发音">🔊</button>
+            </div>
             <div class="pos">${esc(w.pos || '')}</div>
             <div class="meaning">${esc(w.meaning)}</div>
             ${myText ? `<div class="my-extra"><span class="src-tag">补充</span>${esc(myText)}</div>` : ''}
