@@ -65,13 +65,12 @@ export function buildReviewQueue(cards, today = todayKey(), opts = {}) {
 }
 
 /**
- * 错词本：最近一次评分是「不认识」或「模糊」。
- * 只看最近一次，不看累计——否则错过的词会永远留在本子里，越滚越多。
- * 答对一次（认识）就移出。
+ * 错词本：还有没还清的错（lapses > 0）。
+ * 答错 +1、答对 -1，减到 0 自动移出——错得多的词多答对几次才出得去。
  */
 export function buildMistakeList(cards) {
   return Object.values(cards)
-    .filter((c) => c && c.state !== 'new' && (c.lastGrade === 'again' || c.lastGrade === 'hard'))
+    .filter((c) => c && c.state !== 'new' && (c.lapses || 0) > 0)
     .sort((a, b) => {
       if ((b.lapses || 0) !== (a.lapses || 0)) return (b.lapses || 0) - (a.lapses || 0);
       return a.due < b.due ? -1 : 1;

@@ -75,6 +75,9 @@ export function schedule(card, grade, today = todayKey(), now = new Date()) {
   interval = clamp(interval, 1, MAX_INTERVAL);
 
   const lastReviewedAt = now.toISOString();
+  // lapses 记「还没还清的错」：答错 +1，答对 -1，最低 0。
+  // 错词本用它来排优先级，也用来决定什么时候移出。
+  const lapses = Math.max(0, (card.lapses || 0) + (grade === 'again' ? 1 : grade === 'good' ? -1 : 0));
   const next = {
     ...card,
     state: grade === 'again' ? 'learning' : 'review',
@@ -82,7 +85,7 @@ export function schedule(card, grade, today = todayKey(), now = new Date()) {
     interval,
     ease,
     reps: (card.reps || 0) + 1,
-    lapses: (card.lapses || 0) + (grade === 'again' ? 1 : 0),
+    lapses,
     lastGrade: grade,
     lastReviewedAt,
   };

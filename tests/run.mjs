@@ -328,20 +328,33 @@ test('复习队列可以打乱同一天到期的卡，但到期更早的仍然�
   // 不开启时顺序固定（其它调用方依赖这个确定性）
   assert.deepEqual(buildReviewQueue(cards, T0), buildReviewQueue(cards, T0));
 });
-test('错词本：只看最近一次，答对就移出', () => {
+test('错词本：答错记一笔，答对减一笔，减到 0 才移出', () => {
   const cards = freshCards();
   cards.w1 = { ...cards.w1, state: 'review', lastGrade: 'again', lapses: 1 };
-  cards.w2 = { ...cards.w2, state: 'review', lastGrade: 'good', lapses: 2 }; // 累计错过 2 次，但最近答对
+  cards.w2 = { ...cards.w2, state: 'review', lastGrade: 'good', lapses: 2 }; // 还欠 2 笔，仍在
   cards.w3 = { ...cards.w3, state: 'review', lastGrade: 'good', lapses: 0 };
   cards.w4 = { ...cards.w4, state: 'review', lastGrade: 'hard', lapses: 0 };
-  assert.deepEqual(buildMistakeList(cards), ['w1', 'w4']);
+  assert.deepEqual(buildMistakeList(cards), ['w2', 'w1'], '按欠账从多到少排');
 
-  // 复习一遍：w1 答对就离开，w4 继续留着，w2 再次答错又进来
   const st = { cards: { ...cards }, daily: {}, config: { dailyNewTarget: 10 } };
   applyGrade(st, 'good', 'w1', T0, new Date(), { goalNew: 10 });
-  applyGrade(st, 'good', 'w4', T0, new Date(), { goalNew: 10 });
-  applyGrade(st, 'again', 'w2', T0, new Date(), { goalNew: 10 });
-  assert.deepEqual(buildMistakeList(st.cards), ['w2'], '复习后应该减少，而不是只增不减');
+  assert.equal(st.cards.w1.lapses, 0, '答对一次把 1 笔还清');
+  assert.deepEqual(buildMistakeList(st.cards), ['w2']);
+
+  // 欠 2 笔的词要连对两次才出得去
+  applyGrade(st, 'good', 'w2', T0, new Date(), { goalNew: 10 });
+  assert.equal(st.cards.w2.lapses, 1);
+  assert.deepEqual(buildMistakeList(st.cards), ['w2'], '还了 1 笔，还剩 1 笔');
+  applyGrade(st, 'good', 'w2', T0, new Date(), { goalNew: 10 });
+  assert.deepEqual(buildMistakeList(st.cards), [], '还清后移出');
+
+  // 答错会加回去
+  applyGrade(st, 'again', 'w3', T0, new Date(), { goalNew: 10 });
+  assert.deepEqual(buildMistakeList(st.cards), ['w3']);
+  // 最低 0，不会变成负数
+  applyGrade(st, 'good', 'w3', T0, new Date(), { goalNew: 10 });
+  applyGrade(st, 'good', 'w3', T0, new Date(), { goalNew: 10 });
+  assert.equal(st.cards.w3.lapses, 0);
 });
 test('dueOn 统计某天的到期数（明日预告）', () => {
   const cards = freshCards();
