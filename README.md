@@ -1,4 +1,4 @@
-﻿# 背单词（word-drill）
+# 背单词（word-drill）
 
 只服务一个人的背单词网页：雅思词汇真经 3632 词，本地存储，零依赖、零构建、零后端。
 移动端优先，目标是加到 iPhone 主屏、每天点开就能学。
@@ -145,6 +145,7 @@ node tests/smoke-ui.mjs   # 界面冒烟：真跑 app.js，五个页面都能渲
 node tools/import-ielts-bible.mjs    # 抓源文件并转换（--dry 只看统计）
 node tools/fix-deck.mjs              # 应用 tools/deck-fixes.json 里的修订（幂等）
 node tools/split-example-zh.mjs      # 把例句尾巴上粘着的中文搬到 exampleZh
+node tools/live-check.mjs <url>      # 无头浏览器跑一段表达式并截图（验收用）
 ```
 
 三个脚本都可以重复跑：**已是目标状态的条目会被跳过，脚本内置幂等自检**。
