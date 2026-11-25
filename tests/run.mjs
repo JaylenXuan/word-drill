@@ -1,4 +1,4 @@
-// 自检脚本：node tests/run.mjs
+﻿// 自检脚本：node tests/run.mjs
 // 零依赖（只用 node:assert），失败时进程退出码为 1，可直接接 CI 或手跑。
 
 import assert from 'node:assert/strict';
@@ -14,6 +14,7 @@ import {
   STATE_KEY,
 } from '../src/core/storage.js';
 import { applyGrade } from '../src/core/review.js';
+import { speakWord } from '../src/ui/speech.js';
 import { auditNewWords } from '../src/core/audit.js';
 import { createSound } from '../src/ui/sound.js';
 import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from '../src/ui/prefs.js';
@@ -1096,6 +1097,46 @@ group('生词本（自定义词）');
   });
 }
 
+// ---------- 语音朗读 ----------
+group('语音朗读（避免吞掉开头）');
+{
+  const makeSynth = () => {
+    const calls = [];
+    return {
+      calls,
+      synth: {
+        speaking: false,
+        pending: false,
+        paused: false,
+        speak: (u) => calls.push(['speak', u.text]),
+        cancel: () => calls.push(['cancel']),
+      },
+    };
+  };
+  const Utterance = function (text) { this.text = text; };
+
+  test('空闲时直接读，不先 cancel', () => {
+    const { calls, synth } = makeSynth();
+    assert.equal(speakWord('mitigate', { synth, Utterance, delay: 0 }), 'ok');
+    assert.deepEqual(calls, [['speak', 'mitigate']]);
+  });
+  test('正在读的时候才打断，打断后隔一会儿再读', async () => {
+    const { calls, synth } = makeSynth();
+    synth.speaking = true;
+    speakWord('mitigate', { synth, Utterance, delay: 0 });
+    assert.deepEqual(calls, [['cancel']], '打断应该是同步的');
+    await new Promise((r) => setTimeout(r, 20));
+    assert.deepEqual(calls, [['cancel'], ['speak', 'mitigate']]);
+  });
+  test('多拼写词读成停顿；空词不读；不支持返回 unsupported', () => {
+    const { calls, synth } = makeSynth();
+    speakWord('favour / favor', { synth, Utterance, delay: 0 });
+    assert.equal(calls[0][1], 'favour, favor');
+    assert.equal(speakWord('   ', { synth, Utterance, delay: 0 }), 'empty');
+    assert.equal(speakWord('x', { synth: null, Utterance, delay: 0 }), 'unsupported');
+  });
+}
+
 // ---------- 90 天模拟 ----------
 group('90 天模拟（算法在真实时间轴上的行为）');
 const DAYS = 90;
@@ -1175,4 +1216,5 @@ if (stat.fail === 0) {
   for (const f of stat.failures) console.log(`  - [${f.group}] ${f.name}`);
   process.exitCode = 1;
 }
+
 

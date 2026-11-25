@@ -24,6 +24,7 @@ import { customEntryView } from './views/custom-entry.js';
 import { customListView } from './views/custom-list.js';
 import { loadPrefs, savePrefs, backupAgeDays, backupOverdue } from './prefs.js';
 import { createSound } from './sound.js';
+import { speakWord } from './speech.js';
 import { esc } from './dom.js';
 
 // 线性图标（内联 SVG，不引图标库；颜色跟随 currentColor）
@@ -839,12 +840,7 @@ function speak(text) {
     showToast('这个浏览器不支持发音');
     return;
   }
-  const clean = String(text).replace(/\s*\/\s*/g, ', ');
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = 'en-US';
-  u.rate = 0.9;
-  globalThis.speechSynthesis.cancel();
-  globalThis.speechSynthesis.speak(u);
+  speakWord(text);
 }
 
 function updateEta() {

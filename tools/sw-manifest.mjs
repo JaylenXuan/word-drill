@@ -1,4 +1,4 @@
-﻿// Service Worker 的「预缓存清单」与「版本号」来源。
+// Service Worker 的「预缓存清单」与「版本号」来源。
 // 生成脚本和测试都引用这里，保证两边永远算的是同一份东西。
 
 import { readFileSync } from 'node:fs';
@@ -23,6 +23,7 @@ export const PRECACHE = [
   'src/ui/dom.js',
   'src/ui/prefs.js',
   'src/ui/sound.js',
+  'src/ui/speech.js',
   'src/ui/views/custom-entry.js',
   'src/ui/views/custom-list.js',
   'src/ui/views/done.js',
